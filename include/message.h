@@ -8,7 +8,7 @@ private:
   /**
    * The timestamp of the message
    */
-  std::time_t _timestamp;
+  std::tm _time;
 
   /**
    * The actual message
@@ -20,9 +20,9 @@ private:
    */
   std::string _author;
 public:
-  const std::time_t timestamp() const { return _timestamp; };
-  Message& timestamp(std::time_t timestamp) {
-    _timestamp = timestamp;
+  const std::tm time() const { return _time; };
+  Message& time(std::tm time) {
+    _time = time;
     return *this;
   };
 

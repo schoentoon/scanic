@@ -33,7 +33,13 @@ int main(int argc, char **argv) {
 
       // Open the file, loop through it and pass every line to our input analyzer
       std::ifstream logfile(logfilename);
-      for (std::string line; std::getline(logfile, line); ++processed_lines) input->process(line, logfilename);
+      for (std::string line; std::getline(logfile, line); ++processed_lines) {
+        try {
+          input->process(line, logfilename);
+        } catch (const std::exception &error) {
+          std::cerr << error.what() << std::endl;
+        };
+      }
     }
     closedir(dir);
   };
