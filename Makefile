@@ -3,7 +3,7 @@ INC               += -Iinclude
 CC                := cc
 CXX               := c++
 
-BINARY := irclogscan
+BINARY := scanic
 DEPS := build/input_znc.o
 
 all: $(BINARY)
