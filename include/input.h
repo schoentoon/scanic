@@ -17,7 +17,7 @@ protected:
   /**
    * Call this to publish a joined user
    */
-  void publishJoin(std::tm &&when, std::string &&username);
+  void publishJoin(JoinEvent &&join);
 public:
   Input(const std::shared_ptr<Generator> &generator);
 

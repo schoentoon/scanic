@@ -23,7 +23,7 @@ void ZncInput::process(const std::string& input, const std::string &path) {
         open_user += 11; // Increase by length of the literal string above "*** Joins: "
         end_user = input.find_first_of(' ', open_user);
         if (end_user != std::string::npos) {
-          publishJoin(std::move(time), input.substr(open_user, end_user - open_user));
+          publishJoin(JoinEvent(std::move(time), input.substr(open_user, end_user - open_user)));
           return;
         };
       };

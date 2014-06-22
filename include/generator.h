@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "message.h"
+#include "join.h"
 
 class Generator {
 private:
@@ -16,11 +17,11 @@ private:
   /**
    * This will contain all the joined users and the time they joined
    */
-  std::list<std::pair<std::tm, std::string>> _joins;
+  std::list<JoinEvent> _joins;
 public:
   virtual ~Generator() {};
 
   void publishMessage(Message &&message) { _messages.push_back(std::move(message)); };
 
-  void publishJoin(std::tm &&when, std::string &&username) { _joins.emplace_back(std::move(when), std::move(username)); };
+  void publishJoin(JoinEvent &&join) { _joins.push_back(std::move(join)); };
 };

@@ -10,6 +10,6 @@ void Input::publishMessage(Message &&message) {
   _generator->publishMessage(std::move(message));
 };
 
-void Input::publishJoin(std::tm &&when, std::string &&username) {
-  _generator->publishJoin(std::move(when), std::move(username));
+void Input::publishJoin(JoinEvent &&join) {
+  _generator->publishJoin(std::move(join));
 };
