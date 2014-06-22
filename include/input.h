@@ -23,6 +23,11 @@ protected:
    * Call this to publish a quit user
    */
   void publishQuit(QuitEvent &&quit);
+
+  /**
+   * Call this to publish a parted user
+   */
+  void publishPart(PartEvent &&part);
 public:
   Input(const std::shared_ptr<Generator> &generator);
 

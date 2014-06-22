@@ -7,6 +7,7 @@
 #include "message.h"
 #include "join.h"
 #include "quit.h"
+#include "part.h"
 
 class Generator {
 private:
@@ -24,6 +25,11 @@ private:
    * This will contain all the quit users and the time they quit
    */
   std::list<QuitEvent> _quits;
+
+  /**
+   * This will contain all the parted users and the time they parted
+   */
+  std::list<PartEvent> _parts;
 public:
   virtual ~Generator() {};
 
@@ -32,4 +38,6 @@ public:
   void publishJoin(JoinEvent &&join) { _joins.push_back(std::move(join)); };
 
   void publishQuit(QuitEvent &&quit) { _quits.push_back(std::move(quit)); };
+
+  void publishPart(PartEvent &&part) { _parts.push_back(std::move(part)); };
 };

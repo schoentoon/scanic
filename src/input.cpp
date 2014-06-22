@@ -17,3 +17,7 @@ void Input::publishJoin(JoinEvent &&join) {
 void Input::publishQuit(QuitEvent &&quit) {
   _generator->publishQuit(std::move(quit));
 };
+
+void Input::publishPart(PartEvent &&part) {
+  _generator->publishPart(std::move(part));
+};
