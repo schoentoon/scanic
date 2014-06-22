@@ -2,6 +2,7 @@
 #include <fstream>
 #include <memory>
 #include <chrono>
+#include <list>
 
 #include <dirent.h>
 
@@ -19,6 +20,7 @@ int main(int argc, char **argv) {
   std::unique_ptr<Input> input(new ZncInput());
 
   uint64_t processed_lines = 0;
+  std::list<Message> messages;
   // Yuck we can only loop through a directory using C :(
   DIR *dir = nullptr;
   struct dirent *ent;
@@ -35,7 +37,7 @@ int main(int argc, char **argv) {
       std::ifstream logfile(logfilename);
       for (std::string line; std::getline(logfile, line); ++processed_lines) {
         try {
-          input->process(line, logfilename);
+          messages.push_back(std::move(input->process(line, logfilename)));
         } catch (const std::exception &error) {
           std::cerr << error.what() << std::endl;
         };
@@ -45,6 +47,7 @@ int main(int argc, char **argv) {
   };
 
   std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
+  std::cerr << "We got a total of " << messages.size() << " messages." << std::endl;
   std::cerr << "Processed " << processed_lines << " lines in " << elapsed_seconds.count() << " seconds. " << std::endl;
   return 0;
 }
