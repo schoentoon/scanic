@@ -17,10 +17,10 @@ int main(int argc, char **argv) {
   std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
 
   // Create our input analyzer, make this dynamic later on of course
-  std::unique_ptr<Input> input(new ZncInput());
+  std::shared_ptr<Generator> generator(new Generator());
+  std::unique_ptr<Input> input(new ZncInput(generator));
 
   uint64_t processed_lines = 0;
-  std::list<Message> messages;
   // Yuck we can only loop through a directory using C :(
   DIR *dir = nullptr;
   struct dirent *ent;
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
       std::ifstream logfile(logfilename);
       for (std::string line; std::getline(logfile, line); ++processed_lines) {
         try {
-          messages.push_back(std::move(input->process(line, logfilename)));
+          input->process(line, logfilename);
         } catch (const std::exception &error) {
           std::cerr << error.what() << std::endl;
         };
@@ -47,7 +47,6 @@ int main(int argc, char **argv) {
   };
 
   std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
-  std::cerr << "We got a total of " << messages.size() << " messages." << std::endl;
   std::cerr << "Processed " << processed_lines << " lines in " << elapsed_seconds.count() << " seconds. " << std::endl;
   return 0;
 }

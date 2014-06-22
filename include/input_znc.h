@@ -4,7 +4,11 @@
 
 class ZncInput : public Input {
 public:
+  ZncInput(const std::shared_ptr<Generator> &generator)
+  : Input(std::move(generator)) {
+  };
+
   virtual ~ZncInput() {};
 
-  Message process(const std::string &input, const std::string &path) const override;
+  void process(const std::string &input, const std::string &path) override;
 };

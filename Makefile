@@ -4,7 +4,7 @@ CC                := cc
 CXX               := c++
 
 BINARY := scanic
-DEPS := build/input_znc.o
+DEPS := build/input.o build/input_znc.o
 
 all: $(BINARY)
 
