@@ -6,5 +6,5 @@ class ZncInput : public Input {
 public:
   virtual ~ZncInput() {};
 
-  Message process(const std::string &input) const override;
+  Message process(const std::string &input, const std::string &path) const override;
 };

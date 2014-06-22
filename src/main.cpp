@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <chrono>
 
 #include <dirent.h>
 
@@ -12,9 +13,12 @@ int main(int argc, char **argv) {
     return 1;
   };
 
+  std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
+
   // Create our input analyzer, make this dynamic later on of course
   std::unique_ptr<Input> input(new ZncInput());
 
+  uint64_t processed_lines = 0;
   // Yuck we can only loop through a directory using C :(
   DIR *dir = nullptr;
   struct dirent *ent;
@@ -29,9 +33,12 @@ int main(int argc, char **argv) {
 
       // Open the file, loop through it and pass every line to our input analyzer
       std::ifstream logfile(logfilename);
-      for (std::string line; std::getline(logfile, line);) input->process(line);
+      for (std::string line; std::getline(logfile, line); ++processed_lines) input->process(line, logfilename);
     }
     closedir(dir);
   };
+
+  std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
+  std::cerr << "Processed " << processed_lines << " lines in " << elapsed_seconds.count() << " seconds. " << std::endl;
   return 0;
 }

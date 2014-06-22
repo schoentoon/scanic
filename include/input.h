@@ -9,5 +9,5 @@ public:
   /**
    * Implement this method to add support for your own logfiles
    */
-  virtual Message process(const std::string &input) const = 0;
+  virtual Message process(const std::string &input, const std::string &path) const = 0;
 };
