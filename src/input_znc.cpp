@@ -26,6 +26,22 @@ void ZncInput::process(const std::string& input, const std::string &path) {
           publishJoin(JoinEvent(std::move(time), input.substr(open_user, end_user - open_user)));
           return;
         };
+      } else {
+        open_user = input.find("*** Quits: ");
+        if (open_user != std::string::npos) {
+          open_user += 11; // Increase by length of the literal string above "*** Quits: "
+          end_user = input.find_first_of(' ', open_user);
+          if (end_user != std::string::npos) {
+            std::size_t open_msg = input.find_first_of('(', open_user);
+            if (open_msg == std::string::npos) throw std::runtime_error("Failed to parse quit message.");
+            open_msg = input.find_first_of('(', open_msg + 1);
+            if (open_msg == std::string::npos) throw std::runtime_error("Failed to parse quit message.");
+            std::string msg = input.substr(open_msg + 1, input.size() - open_msg - 2);
+
+            publishQuit(QuitEvent(std::move(time), input.substr(open_user, end_user - open_user), std::move(msg)));
+            return;
+          };
+        };
       };
     };
 

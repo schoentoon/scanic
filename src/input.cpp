@@ -13,3 +13,7 @@ void Input::publishMessage(Message &&message) {
 void Input::publishJoin(JoinEvent &&join) {
   _generator->publishJoin(std::move(join));
 };
+
+void Input::publishQuit(QuitEvent &&quit) {
+  _generator->publishQuit(std::move(quit));
+};

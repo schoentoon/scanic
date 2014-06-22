@@ -18,6 +18,11 @@ protected:
    * Call this to publish a joined user
    */
   void publishJoin(JoinEvent &&join);
+
+  /**
+   * Call this to publish a quit user
+   */
+  void publishQuit(QuitEvent &&quit);
 public:
   Input(const std::shared_ptr<Generator> &generator);
 
