@@ -23,7 +23,8 @@ public:
   QuitEvent() {};
   QuitEvent(std::tm &&when, std::string &&username, std::string &&msg = "")
   : _when(std::move(when))
-  , _username(std::move(username)) {
+  , _username(std::move(username))
+  , _message(std::move(msg)) {
   };
 
   const std::tm when() const { return _when; };
