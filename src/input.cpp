@@ -21,3 +21,7 @@ void Input::publishQuit(QuitEvent &&quit) {
 void Input::publishPart(PartEvent &&part) {
   _generator->publishPart(std::move(part));
 };
+
+void Input::publishKick(KickEvent &&kick) {
+  _generator->publishKick(std::move(kick));
+};

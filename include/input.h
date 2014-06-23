@@ -28,6 +28,11 @@ protected:
    * Call this to publish a parted user
    */
   void publishPart(PartEvent &&part);
+
+  /**
+   * Call this to publish a kicked user
+   */
+  void publishKick(KickEvent &&kick);
 public:
   Input(const std::shared_ptr<Generator> &generator);
 
