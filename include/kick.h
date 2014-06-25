@@ -1,15 +1,9 @@
 #pragma once
 
-#include <string>
-#include <ctime>
+#include "event.h"
 
-class KickEvent {
+class KickEvent : public Event {
 private:
-  /**
-   * When did this user get kicked?
-   */
-  std::tm _when;
-
   /**
    * The username of the kicked user
    */
@@ -25,18 +19,12 @@ private:
    */
   std::string _message;
 public:
-  KickEvent() {};
+  KickEvent() : Event() {};
   KickEvent(std::tm &&when, std::string &&username, std::string &&kicker, std::string &&msg = "")
-  : _when(std::move(when))
+  : Event(std::move(when))
   , _username(std::move(username))
   , _kicker(std::move(kicker))
   , _message(std::move(msg)) {
-  };
-
-  const std::tm when() const { return _when; };
-  KickEvent& when(const std::tm &when) {
-    _when = when;
-    return *this;
   };
 
   const std::string username() const { return _username; };

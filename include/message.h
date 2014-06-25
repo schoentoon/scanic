@@ -1,14 +1,9 @@
 #pragma once
 
-#include <ctime>
-#include <string>
+#include "event.h"
 
-class Message {
+class Message : public Event {
 private:
-  /**
-   * The timestamp of the message
-   */
-  std::tm _time;
 
   /**
    * The actual message
@@ -25,12 +20,6 @@ private:
    */
   bool _action = false;
 public:
-  const std::tm time() const { return _time; };
-  Message& time(std::tm time) {
-    _time = time;
-    return *this;
-  };
-
   const std::string message() const { return _message; };
   Message& message(std::string message) {
     _message = message;

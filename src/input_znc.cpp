@@ -11,7 +11,6 @@ void ZncInput::process(const std::string& input, const std::string &path) {
   if (strptime(input.c_str(), "[%H:%M:%S]", &time) == nullptr) throw std::runtime_error("Failed to parse time");
 
   Message output;
-  output.time(time);
 
   std::size_t open_user = input.find_first_of('<');
   std::size_t end_user = input.find_first_of('>');
@@ -51,7 +50,7 @@ void ZncInput::process(const std::string& input, const std::string &path) {
           open_user += 4; // Increase by 4 so we're at the start of the username
           KickEvent kick;
           kick.username(input.substr(open_user, input.find_first_of(' ', open_user) - open_user))
-              .when(time);
+              .time(std::move(time));
           open_user = input.find(" was kicked by ") + 15; // 15 is the length of " was kicked by "
           kick.kicker(input.substr(open_user, input.find_first_of(' ', open_user) - open_user));
           open_user = input.find("(", open_user); // We're abusing open_user here to store the start of the kick message
@@ -74,7 +73,8 @@ void ZncInput::process(const std::string& input, const std::string &path) {
     output.author(input.substr(open_user + 1, end_user - open_user - 1)); // +1 to the open to skip the < and - 1 to the end to skip the >
 
   // + 2 to skip the > of the username and the space just after it
-  output.message(input.substr(end_user + 2));
+  output.message(input.substr(end_user + 2))
+        .time(std::move(time));
 
   publishMessage(std::move(output));
 }
