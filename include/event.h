@@ -2,8 +2,14 @@
 
 #include <ctime>
 #include <string>
+#include <functional>
 
 class Event {
+public:
+  /**
+   *  Simple compare function
+   */
+  static bool compare(const Event &lhs, const Event &rhs) { return lhs._time < rhs._time; };
 private:
   /**
    * The timestamp of the message

@@ -46,7 +46,9 @@ int main(int argc, char **argv) {
     closedir(dir);
   };
 
+  auto sorttime = generator->sort();
   std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
   std::cerr << "Processed " << processed_lines << " lines in " << elapsed_seconds.count() << " seconds. " << std::endl;
+  std::cerr << "Sorting took about " << sorttime.count() << " seconds." << std::endl;
   return 0;
 }

@@ -2,6 +2,7 @@
 
 #include <list>
 #include <string>
+#include <chrono>
 #include <iostream>
 
 #include "message.h"
@@ -48,4 +49,6 @@ public:
   void publishPart(PartEvent &&part) { _parts.push_back(std::move(part)); };
 
   void publishKick(KickEvent &&kick) { _kicks.push_back(std::move(kick)); };
+
+  std::chrono::duration<double> sort();
 };
