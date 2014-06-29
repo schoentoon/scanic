@@ -7,5 +7,6 @@ std::chrono::duration<double> Generator::sort() {
   _quits.sort(Event::compare);
   _parts.sort(Event::compare);
   _kicks.sort(Event::compare);
+  _nick_changes.sort(Event::compare);
   return std::chrono::system_clock::now() - start;
 };

@@ -10,6 +10,7 @@
 #include "quit.h"
 #include "part.h"
 #include "kick.h"
+#include "nickchange.h"
 
 class Generator {
 private:
@@ -37,6 +38,11 @@ private:
    * This will contain all the kicked users and the times they were kicked
    */
   std::list<KickEvent> _kicks;
+
+  /**
+   * This will contain all the nick name changes
+   */
+  std::list<NickChangeEvent> _nick_changes;
 public:
   virtual ~Generator() {};
 
@@ -49,6 +55,8 @@ public:
   void publishPart(PartEvent &&part) { _parts.push_back(std::move(part)); };
 
   void publishKick(KickEvent &&kick) { _kicks.push_back(std::move(kick)); };
+
+  void publishNickChange(NickChangeEvent &&nickchange) { _nick_changes.push_back(std::move(nickchange)); };
 
   std::chrono::duration<double> sort();
 };

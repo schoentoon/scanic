@@ -7,6 +7,9 @@
 
 class Input {
 private:
+  /**
+   *  The generator we actually publish our events to
+   */
   std::shared_ptr<Generator> _generator;
 protected:
   /**
@@ -33,6 +36,11 @@ protected:
    * Call this to publish a kicked user
    */
   void publishKick(KickEvent &&kick);
+
+  /**
+   * Call this to publish a change nickname event
+   */
+  void publishNickChange(NickChangeEvent &&nickchange);
 public:
   Input(const std::shared_ptr<Generator> &generator);
 

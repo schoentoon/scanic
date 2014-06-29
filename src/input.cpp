@@ -25,3 +25,7 @@ void Input::publishPart(PartEvent &&part) {
 void Input::publishKick(KickEvent &&kick) {
   _generator->publishKick(std::move(kick));
 };
+
+void Input::publishNickChange(NickChangeEvent &&nickchange) {
+  _generator->publishNickChange(std::move(nickchange));
+};

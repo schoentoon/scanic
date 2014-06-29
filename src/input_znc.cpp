@@ -25,6 +25,15 @@ void ZncInput::process(const std::string& input, const std::string &path) {
           publishJoin(JoinEvent(std::move(time), input.substr(open_user, end_user - open_user)));
           return;
         };
+      } else if (input.find(" is now known as ") != std::string::npos) {
+        // Time to check for name changes..
+        open_user = input.find("*** ") + 4;
+        NickChangeEvent nickchange;
+        nickchange.originalUsername(input.substr(open_user, input.find(" ", open_user) - open_user))
+                  .time(std::move(time));
+        open_user = input.find(" is now known as ") + 17; // 17 is the length of " is now known as "
+        nickchange.newUsername(input.substr(open_user, input.size() - open_user));
+        publishNickChange(std::move(nickchange));
       } else {
         // Here we're going to check for quits and parts
         open_user = input.find("*** Quits: ");
