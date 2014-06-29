@@ -21,14 +21,22 @@ private:
   bool _action = false;
 public:
   const std::string message() const { return _message; };
-  Message& message(std::string message) {
+  Message& message(const std::string &message) {
     _message = message;
+    return *this;
+  };
+  Message& message(std::string &&message) {
+    _message = std::move(message);
     return *this;
   };
 
   const std::string author() const { return _author; };
-  Message& author(std::string author) {
+  Message& author(const std::string &author) {
     _author = author;
+    return *this;
+  };
+  Message& author(std::string &&author) {
+    _author = std::move(author);
     return *this;
   };
 

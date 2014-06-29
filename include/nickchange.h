@@ -28,10 +28,18 @@ public:
     _original_username = original_username;
     return *this;
   };
+  NickChangeEvent& originalUsername(std::string &&original_username) {
+    _original_username = std::move(original_username);
+    return *this;
+  };
 
   const std::string newUsername() const { return _new_username; };
   NickChangeEvent& newUsername(const std::string &new_username) {
     _new_username = new_username;
+    return *this;
+  };
+  NickChangeEvent& newUsername(std::string &&new_username) {
+    _new_username = std::move(new_username);
     return *this;
   };
 };

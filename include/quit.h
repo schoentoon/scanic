@@ -26,10 +26,18 @@ public:
     _username = username;
     return *this;
   };
+  QuitEvent& username(std::string &&username) {
+    _username = std::move(username);
+    return *this;
+  };
 
   const std::string message() const { return _message; };
   QuitEvent& message(const std::string &message) {
     _message = message;
+    return *this;
+  };
+  QuitEvent& message(std::string &&message) {
+    _message = std::move(message);
     return *this;
   };
 };

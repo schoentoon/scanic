@@ -32,16 +32,28 @@ public:
     _username = username;
     return *this;
   };
+  KickEvent& username(std::string &&username) {
+    _username = std::move(username);
+    return *this;
+  };
 
   const std::string kicker() const { return _kicker; };
   KickEvent& kicker(const std::string &kicker) {
     _kicker = kicker;
     return *this;
   };
+  KickEvent& kicker(std::string &&kicker) {
+    _kicker = std::move(kicker);
+    return *this;
+  };
 
   const std::string message() const { return _message; };
   KickEvent& message(const std::string &message) {
     _message = message;
+    return *this;
+  };
+  KickEvent& message(std::string &&message) {
+    _message = std::move(message);
     return *this;
   };
 };

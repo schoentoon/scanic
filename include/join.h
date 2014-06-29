@@ -20,4 +20,8 @@ public:
     _username = username;
     return *this;
   };
+  JoinEvent& username(std::string &&username) {
+    _username = std::move(username);
+    return *this;
+  };
 };
