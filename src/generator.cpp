@@ -14,8 +14,11 @@ std::chrono::duration<double> Generator::sort() {
 Variant::Value Generator::analyze() {
   std::map<std::string, Variant::Value> output;
   for (auto &analyzer : _analyzers) {
+    std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
     analyzer->analyze(*this);
     output[analyzer->name()] = analyzer->result();
+    std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
+    output["timing"][analyzer->name()] = elapsed_seconds.count();
   };
   return output;
 };
