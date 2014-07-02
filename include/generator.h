@@ -5,6 +5,8 @@
 #include <chrono>
 #include <iostream>
 
+#include "analyzer.h"
+
 #include "message.h"
 #include "join.h"
 #include "quit.h"
@@ -43,6 +45,11 @@ private:
    * This will contain all the nick name changes
    */
   std::list<NickChangeEvent> _nick_changes;
+
+  /**
+   * All the analyzers to use to generate our end result
+   */
+  std::list<std::unique_ptr<Analyzer>> _analyzers;
 public:
   virtual ~Generator() {};
 
@@ -59,4 +66,23 @@ public:
   void publishNickChange(NickChangeEvent &&nickchange) { _nick_changes.push_back(std::move(nickchange)); };
 
   std::chrono::duration<double> sort();
+
+  const std::list<Message> &messages() const { return _messages; };
+
+  const std::list<JoinEvent> &joins() const { return _joins; };
+
+  const std::list<QuitEvent> &quits() const { return _quits; };
+
+  const std::list<PartEvent> &parts() const { return _parts; };
+
+  const std::list<KickEvent> &kicks() const { return _kicks; };
+
+  const std::list<NickChangeEvent> &nickChanges() const { return _nick_changes; };
+
+  /**
+   *  Load an analyzer, we will take ownership!
+   */
+  void loadAnalyzer(Analyzer *analyzer) { _analyzers.emplace_back(analyzer); };
+
+  Variant::Value analyze();
 };

@@ -10,3 +10,12 @@ std::chrono::duration<double> Generator::sort() {
   _nick_changes.sort(Event::compare);
   return std::chrono::system_clock::now() - start;
 };
+
+Variant::Value Generator::analyze() {
+  std::map<std::string, Variant::Value> output;
+  for (auto &analyzer : _analyzers) {
+    analyzer->analyze(*this);
+    output[analyzer->name()] = analyzer->result();
+  };
+  return output;
+};

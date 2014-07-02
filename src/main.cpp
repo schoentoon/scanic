@@ -7,6 +7,7 @@
 #include <dirent.h>
 
 #include "input_znc.h"
+#include "linecount.h"
 
 int main(int argc, char **argv) {
   if (argc != 2) {
@@ -47,8 +48,15 @@ int main(int argc, char **argv) {
   };
 
   auto sorttime = generator->sort();
+  std::cerr << "Sorting took about " << sorttime.count() << " seconds." << std::endl;
+
+  generator->loadAnalyzer(new LineCountAnalyzer());
+
+  auto output = generator->analyze();
+
+  std::cerr << output.toJsonString() << std::endl;
+
   std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
   std::cerr << "Processed " << processed_lines << " lines in " << elapsed_seconds.count() << " seconds. " << std::endl;
-  std::cerr << "Sorting took about " << sorttime.count() << " seconds." << std::endl;
   return 0;
 }

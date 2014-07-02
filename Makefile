@@ -1,5 +1,6 @@
 override CXXFLAGS += -std=c++11 -g -Wall -O2 -pipe
-INC               += -Iinclude
+INC               += -Iinclude -Iinclude/analyzers
+LDFLAGS           := -lvariant -ljson-c
 CC                := cc
 CXX               := c++
 
