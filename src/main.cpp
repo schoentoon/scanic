@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <future>
 #include <memory>
 #include <chrono>
 #include <list>
@@ -19,7 +20,6 @@ int main(int argc, char **argv) {
 
   // Create our input analyzer, make this dynamic later on of course
   std::shared_ptr<Generator> generator(new Generator());
-  std::unique_ptr<Input> input(new ZncInput(generator));
 
   uint64_t processed_lines = 0;
   // Yuck we can only loop through a directory using C :(
@@ -34,15 +34,18 @@ int main(int argc, char **argv) {
       std::string logfilename(argv[1]);
       logfilename.append("/").append(ent->d_name);
 
-      // Open the file, loop through it and pass every line to our input analyzer
-      std::ifstream logfile(logfilename);
-      for (std::string line; std::getline(logfile, line); ++processed_lines) {
-        try {
-          input->process(line, logfilename);
-        } catch (const std::exception &error) {
-          std::cerr << error.what() << std::endl;
-        };
-      }
+      std::async(std::launch::async, [generator, logfilename, &processed_lines]() {
+        std::unique_ptr<Input> input(new ZncInput(generator));
+        // Open the file, loop through it and pass every line to our input analyzer
+        std::ifstream logfile(logfilename);
+        for (std::string line; std::getline(logfile, line); ++processed_lines) {
+          try {
+            input->process(line, logfilename);
+          } catch (const std::exception &error) {
+            std::cerr << error.what() << std::endl;
+          };
+        }
+      });
     }
     closedir(dir);
   };

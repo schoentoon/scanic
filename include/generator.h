@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 #include <chrono>
+#include <mutex>
 #include <iostream>
 
 #include "analyzer.h"
@@ -13,6 +14,11 @@
 #include "part.h"
 #include "kick.h"
 #include "nickchange.h"
+
+/**
+ * Forward declaration
+ */
+class Input;
 
 class Generator {
 private:
@@ -47,23 +53,16 @@ private:
   std::list<NickChangeEvent> _nick_changes;
 
   /**
+   * Lock for when we're mass inserting events
+   */
+  std::mutex _lock;
+
+  /**
    * All the analyzers to use to generate our end result
    */
   std::list<std::unique_ptr<Analyzer>> _analyzers;
 public:
   virtual ~Generator() {};
-
-  void publishMessage(Message &&message) { _messages.push_back(std::move(message)); };
-
-  void publishJoin(JoinEvent &&join) { _joins.push_back(std::move(join)); };
-
-  void publishQuit(QuitEvent &&quit) { _quits.push_back(std::move(quit)); };
-
-  void publishPart(PartEvent &&part) { _parts.push_back(std::move(part)); };
-
-  void publishKick(KickEvent &&kick) { _kicks.push_back(std::move(kick)); };
-
-  void publishNickChange(NickChangeEvent &&nickchange) { _nick_changes.push_back(std::move(nickchange)); };
 
   std::chrono::duration<double> sort();
 
@@ -78,6 +77,8 @@ public:
   const std::list<KickEvent> &kicks() const { return _kicks; };
 
   const std::list<NickChangeEvent> &nickChanges() const { return _nick_changes; };
+
+  void insertInput(Input *input);
 
   /**
    *  Load an analyzer, we will take ownership!
