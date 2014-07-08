@@ -14,10 +14,13 @@ public:
   /**
    *  Override this method to actually analyze the data
    */
-  void analyze(const Generator &generator) {
+  std::map<std::string, Variant::Value> analyze(const Generator &generator) {
     std::map<std::string, int64_t> lines;
     for (auto &msg : generator.messages()) ++lines[msg.author()];
 
-    for (auto &l : lines) _result[l.first] = l.second;
+    std::map<std::string, Variant::Value> output;
+    for (auto &l : lines) output[l.first] = l.second;
+
+    return output;
   };
 };

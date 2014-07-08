@@ -5,11 +5,6 @@
 class Generator;
 
 class Analyzer {
-protected:
-  /**
-   *  Store your actual results in here.
-   */
-  std::map<std::string, Variant::Value> _result;
 public:
   Analyzer() {};
   virtual ~Analyzer() {};
@@ -21,7 +16,5 @@ public:
   /**
    *  Override this method to actually analyze the data
    */
-  virtual void analyze(const Generator &generator) = 0;
-
-  const std::map<std::string, Variant::Value> &result() const { return _result; };
+  virtual std::map<std::string, Variant::Value> analyze(const Generator &generator) = 0;
 };

@@ -3,6 +3,7 @@
 #include <future>
 #include <memory>
 #include <chrono>
+#include <queue>
 #include <list>
 
 #include <dirent.h>
@@ -21,10 +22,11 @@ int main(int argc, char **argv) {
   // Create our input analyzer, make this dynamic later on of course
   std::shared_ptr<Generator> generator(new Generator());
 
-  uint64_t processed_lines = 0;
   // Yuck we can only loop through a directory using C :(
   DIR *dir = nullptr;
   struct dirent *ent;
+  std::queue<std::future<uint64_t>> futures;
+
   if ((dir = opendir(argv[1])) != nullptr) {
     while ((ent = readdir (dir)) != nullptr) {
       // Skip hidden files and . and ..
@@ -34,7 +36,8 @@ int main(int argc, char **argv) {
       std::string logfilename(argv[1]);
       logfilename.append("/").append(ent->d_name);
 
-      std::async(std::launch::async, [generator, logfilename, &processed_lines]() {
+      futures.emplace(std::async(std::launch::async, [generator, logfilename]() -> uint64_t {
+        uint64_t processed_lines = 0;
         std::unique_ptr<Input> input(new ZncInput(generator));
         // Open the file, loop through it and pass every line to our input analyzer
         std::ifstream logfile(logfilename);
@@ -45,9 +48,18 @@ int main(int argc, char **argv) {
             std::cerr << error.what() << std::endl;
           };
         }
-      });
+        return processed_lines;
+      }));
     }
     closedir(dir);
+  };
+
+  uint64_t processed_lines = 0;
+
+  while (!futures.empty()) {
+    auto &future = futures.front();
+    processed_lines += future.get();
+    futures.pop();
   };
 
   auto sorttime = generator->sort();
