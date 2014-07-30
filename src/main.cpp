@@ -8,30 +8,53 @@
 
 #include <dirent.h>
 #include <getopt.h>
+#include <dlfcn.h>
 
-#include "input_znc.h"
+#include "input.h"
 #include "linecount.h"
 
 static const struct option g_LongOpts[] = {
-  { "help",       no_argument,       0, 'h' },
-  { "input",      required_argument, 0, 'i' },
+  { "help",         no_argument,       0, 'h' },
+  { "input-module", required_argument, 0, 'I' },
+  { "input",        required_argument, 0, 'i' },
   { 0, 0, 0, 0 }
 };
 
 static int usage(const char *prog) {
   std::cerr << "USAGE: " << prog << " [options]" << std::endl
-            << "-h, --help      Show this help message" << std::endl
-            << "-i, --input     Input folder, repeat for multiple folders" << std::endl;
+            << "-h, --help         Show this help message" << std::endl
+            << "-I, --input-module The input module to use" << std::endl
+            << "-i, --input        Input folder, repeat for multiple folders" << std::endl;
   return 1;
 };
 
 int main(int argc, char **argv) {
   std::vector<std::string> input;
+  void *input_handle = nullptr;
+  typedef Input* (InputCreator)(const std::shared_ptr<Generator> &generator);
+  InputCreator *input_creator = nullptr;
+
   int arg, optindex;
-  while ((arg = getopt_long(argc, argv, "hi:", g_LongOpts, &optindex)) != -1) {
+  while ((arg = getopt_long(argc, argv, "hI:i:", g_LongOpts, &optindex)) != -1) {
     switch (arg) {
     case 'h':
       return usage(argv[0]);
+    case 'I':
+      if (input_handle != nullptr) {
+        std::cerr << "You already picked a input module, can only pick one!" << std::endl;
+        break;
+      };
+      input_handle = dlopen(optarg, RTLD_NOW);
+      if (input_handle == nullptr) {
+        std::cerr << dlerror() << std::endl;
+        return 1;
+      };
+      input_creator = (InputCreator*) dlsym(input_handle, "loadInput");
+      if (input_creator == nullptr) {
+        std::cerr << dlerror() << std::endl;
+        return 1;
+      };
+      break;
     case 'i':
       input.emplace_back(optarg);
       break;
@@ -40,6 +63,11 @@ int main(int argc, char **argv) {
 
   if (input.empty()) {
     std::cerr << "No input folders, can't continue." << std::endl;
+    return 1;
+  };
+
+  if (input_handle == nullptr || input_creator == nullptr) {
+    std::cerr << "No input module found, can't continue." << std::endl;
     return 1;
   };
 
@@ -64,9 +92,9 @@ int main(int argc, char **argv) {
         logfilename.push_back('/');
         logfilename.append(ent->d_name);
 
-        futures.emplace(std::async(std::launch::async, [generator, logfilename]() -> uint64_t {
+        futures.emplace(std::async(std::launch::async, [input_creator, generator, logfilename]() -> uint64_t {
           uint64_t processed_lines = 0;
-          std::unique_ptr<Input> input(new ZncInput(generator));
+          std::unique_ptr<Input> input(input_creator(generator));
           // Open the file, loop through it and pass every line to our input analyzer
           std::ifstream logfile(logfilename);
           for (std::string line; std::getline(logfile, line); ++processed_lines) {

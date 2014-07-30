@@ -5,6 +5,8 @@
 #include "message.h"
 #include "generator.h"
 
+#define INPUTMODULE(classname) extern "C" Input* loadInput(const std::shared_ptr<Generator> &generator) { return new classname(generator); }
+
 class Input {
 private:
   /**
