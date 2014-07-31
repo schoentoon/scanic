@@ -1,10 +1,10 @@
-#pragma once
-
 #include "analyzer.h"
+
+#include "generator.h"
 
 class LineCountAnalyzer : public Analyzer {
 public:
-  LineCountAnalyzer() : Analyzer() {};
+  LineCountAnalyzer(void *handle) : Analyzer(handle) {};
   virtual ~LineCountAnalyzer() {};
   /**
    *  Return the name of your analyzer
@@ -24,3 +24,5 @@ public:
     return output;
   };
 };
+
+ANALYZEMODULE(LineCountAnalyzer);

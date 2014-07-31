@@ -2,12 +2,20 @@
 
 #include <variant.h>
 
+#define ANALYZEMODULE(classname) extern "C" Analyzer* loadAnalyzer(void *handle) { return new classname(handle); }
+
 class Generator;
 
 class Analyzer {
+private:
+  /**
+   * Handle to the shared library that should be closed upon destruction
+   */
+  void* _handle;
+
 public:
-  Analyzer() {};
-  virtual ~Analyzer() {};
+  Analyzer(void *handle);
+  virtual ~Analyzer();
   /**
    *  Return the name of your analyzer
    */

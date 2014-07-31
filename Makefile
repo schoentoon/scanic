@@ -6,9 +6,10 @@ CXX               := c++
 
 BINARY := scanic
 INPUT_MODULES := inputs/input_znc.so
-DEPS := build/input.o build/generator.o
+ANALYZERS := analyzers/linecount.so
+DEPS := build/input.o build/analyzer.o build/generator.o
 
-all: $(BINARY)
+all: $(BINARY) $(INPUT_MODULES) $(ANALYZERS)
 
 build:
 	mkdir build
@@ -16,16 +17,22 @@ build:
 inputs:
 	mkdir inputs
 
+analyzers:
+	mkdir analyzers
+
 build/%.o: src/%.cpp include/%.h build
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -c $< -o $@
 
 inputs/%.so: src/inputs/%.cpp inputs
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -shared $< -o $@
 
-$(BINARY): $(DEPS) src/main.cpp $(INPUT_MODULES)
+analyzers/%.so: src/analyzers/%.cpp analyzers
+	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -shared $< -o $@
+
+$(BINARY): $(DEPS) src/main.cpp
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -o $(BINARY) src/main.cpp $(DEPS) $(LDFLAGS)
 
 .PHONY: clean
 
 clean:
-	rm -rf $(BINARY) build inputs
+	rm -rf $(BINARY) build inputs analyzers

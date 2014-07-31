@@ -11,12 +11,13 @@
 #include <dlfcn.h>
 
 #include "input.h"
-#include "linecount.h"
+#include "analyzer.h"
 
 static const struct option g_LongOpts[] = {
   { "help",         no_argument,       0, 'h' },
   { "input-module", required_argument, 0, 'I' },
   { "input",        required_argument, 0, 'i' },
+  { "analyzer",     required_argument, 0, 'a' },
   { 0, 0, 0, 0 }
 };
 
@@ -24,18 +25,22 @@ static int usage(const char *prog) {
   std::cerr << "USAGE: " << prog << " [options]" << std::endl
             << "-h, --help         Show this help message" << std::endl
             << "-I, --input-module The input module to use" << std::endl
-            << "-i, --input        Input folder, repeat for multiple folders" << std::endl;
+            << "-i, --input        Input folder, repeat for multiple folders" << std::endl
+            << "-a, --analyzer     Load this analyzer and use it for our output" << std::endl;
   return 1;
 };
 
 int main(int argc, char **argv) {
   std::vector<std::string> input;
+
   void *input_handle = nullptr;
   typedef Input* (InputCreator)(const std::shared_ptr<Generator> &generator);
   InputCreator *input_creator = nullptr;
 
+  std::shared_ptr<Generator> generator(new Generator());
+
   int arg, optindex;
-  while ((arg = getopt_long(argc, argv, "hI:i:", g_LongOpts, &optindex)) != -1) {
+  while ((arg = getopt_long(argc, argv, "hI:i:a:", g_LongOpts, &optindex)) != -1) {
     switch (arg) {
     case 'h':
       return usage(argv[0]);
@@ -58,6 +63,21 @@ int main(int argc, char **argv) {
     case 'i':
       input.emplace_back(optarg);
       break;
+    case 'a': {
+      void *handle = dlopen(optarg, RTLD_NOW);
+      if (handle == nullptr) {
+        std::cerr << dlerror() << std::endl;
+        return 1;
+      };
+      typedef Analyzer* (AnalyzerCreator)(void *handle);
+      AnalyzerCreator* func = (AnalyzerCreator*) dlsym(handle, "loadAnalyzer");
+      if (func == nullptr) {
+        std::cerr << dlerror() << std::endl;
+        return 1;
+      };
+      generator->loadAnalyzer(func(handle));
+      break;
+    };
     };
   };
 
@@ -72,9 +92,6 @@ int main(int argc, char **argv) {
   };
 
   std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
-
-  // Create our input analyzer, make this dynamic later on of course
-  std::shared_ptr<Generator> generator(new Generator());
 
   // Yuck we can only loop through a directory using C :(
   DIR *dir = nullptr;
@@ -121,8 +138,6 @@ int main(int argc, char **argv) {
 
   auto sorttime = generator->sort();
   std::cerr << "Sorting took about " << sorttime.count() << " seconds." << std::endl;
-
-  generator->loadAnalyzer(new LineCountAnalyzer());
 
   auto output = generator->analyze();
 
