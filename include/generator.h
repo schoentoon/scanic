@@ -60,8 +60,9 @@ private:
   /**
    * All the analyzers to use to generate our end result
    */
-  std::list<std::unique_ptr<Analyzer>> _analyzers;
+  std::list<std::unique_ptr<Analyzer, void(*)(Analyzer*)>> _analyzers;
 public:
+  Generator();
   virtual ~Generator() {};
 
   std::chrono::duration<double> sort();
@@ -83,7 +84,7 @@ public:
   /**
    *  Load an analyzer, we will take ownership!
    */
-  void loadAnalyzer(Analyzer *analyzer) { _analyzers.emplace_back(analyzer); };
+  void loadAnalyzer(Analyzer *analyzer);
 
   Variant::Value analyze();
 };

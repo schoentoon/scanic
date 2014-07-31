@@ -13,6 +13,11 @@ private:
    */
   void* _handle;
 
+  /**
+   * Generator is our friend so he can unload us before deleting us
+   */
+  friend class Generator;
+
 public:
   Analyzer(void *handle);
   virtual ~Analyzer();

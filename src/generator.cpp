@@ -1,6 +1,11 @@
 #include "generator.h"
 
+#include <dlfcn.h>
+
 #include "input.h"
+
+Generator::Generator() {
+};
 
 std::chrono::duration<double> Generator::sort() {
   std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
@@ -33,4 +38,12 @@ void Generator::insertInput(Input* input) {
   _parts.splice(_parts.begin(), std::move(input->_parts));
   _kicks.splice(_kicks.begin(), std::move(input->_kicks));
   _nick_changes.splice(_nick_changes.begin(), std::move(input->_nick_changes));
+};
+
+void Generator::loadAnalyzer(Analyzer* analyzer) {
+  _analyzers.emplace_back(analyzer, [](Analyzer *analyzer) {
+    void *handle = analyzer->_handle;
+    delete analyzer;
+    dlclose(handle);
+  });
 };
