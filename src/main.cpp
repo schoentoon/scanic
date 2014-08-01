@@ -136,6 +136,11 @@ int main(int argc, char **argv) {
     futures.pop();
   };
 
+  // We no longer need the input module at this point so let's close it and all
+  dlclose(input_handle);
+  input_handle = nullptr;
+  input_creator = nullptr;
+
   auto sorttime = generator->sort();
   std::cerr << "Sorting took about " << sorttime.count() << " seconds." << std::endl;
 
