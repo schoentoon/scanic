@@ -6,6 +6,8 @@
 #include <queue>
 #include <list>
 
+#include <sys/stat.h>
+#include <string.h>
 #include <dirent.h>
 #include <getopt.h>
 #include <dlfcn.h>
@@ -25,7 +27,7 @@ static int usage(const char *prog) {
   std::cerr << "USAGE: " << prog << " [options]" << std::endl
             << "-h, --help         Show this help message" << std::endl
             << "-I, --input-module The input module to use" << std::endl
-            << "-i, --input        Input folder, repeat for multiple folders" << std::endl
+            << "-i, --input        Input file/folder, repeat for multiple files/folders" << std::endl
             << "-a, --analyzer     Load this analyzer and use it for our output" << std::endl;
   return 1;
 };
@@ -82,7 +84,7 @@ int main(int argc, char **argv) {
   };
 
   if (input.empty()) {
-    std::cerr << "No input folders, can't continue." << std::endl;
+    std::cerr << "No input files/folders, can't continue." << std::endl;
     return 1;
   };
 
@@ -93,39 +95,62 @@ int main(int argc, char **argv) {
 
   std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
 
-  // Yuck we can only loop through a directory using C :(
-  DIR *dir = nullptr;
-  struct dirent *ent;
   std::queue<std::future<uint64_t>> futures;
 
   for (const std::string &in : input) {
-    if ((dir = opendir(in.c_str())) != nullptr) {
-      while ((ent = readdir (dir)) != nullptr) {
-        // Skip hidden files and . and ..
-        if (ent->d_name[0] == '.') continue;
-
-        // Build our filename
-        std::string logfilename(in.c_str());
-        logfilename.push_back('/');
-        logfilename.append(ent->d_name);
-
-        futures.emplace(std::async(std::launch::async, [input_creator, generator, logfilename]() -> uint64_t {
-          uint64_t processed_lines = 0;
-          std::unique_ptr<Input> input(input_creator(generator));
-          // Open the file, loop through it and pass every line to our input analyzer
-          std::ifstream logfile(logfilename);
-          for (std::string line; std::getline(logfile, line); ++processed_lines) {
-            try {
-              input->process(line, logfilename);
-            } catch (const std::exception &error) {
-              std::cerr << error.what() << std::endl;
-            };
-          }
-          return processed_lines;
-        }));
-      }
-      closedir(dir);
+    struct stat st_buf;
+    if (stat(in.c_str(), &st_buf) != 0) {
+      std::cerr << strerror(errno) << std::endl;
+      continue;
     };
+
+    if (S_ISREG(st_buf.st_mode)) {
+      futures.emplace(std::async(std::launch::async, [input_creator, generator, in]() -> uint64_t {
+        uint64_t processed_lines = 0;
+        std::unique_ptr<Input> input(input_creator(generator));
+        // Open the file, loop through it and pass every line to our input analyzer
+        std::ifstream logfile(in);
+        for (std::string line; std::getline(logfile, line); ++processed_lines) {
+          try {
+            input->process(line, in);
+          } catch (const std::exception &error) {
+            std::cerr << error.what() << std::endl;
+          };
+        }
+        return processed_lines;
+      }));
+    } else if (S_ISDIR(st_buf.st_mode)) {
+      DIR *dir = nullptr;
+      struct dirent *ent;
+      if ((dir = opendir(in.c_str())) != nullptr) {
+        while ((ent = readdir (dir)) != nullptr) {
+          // Skip hidden files and . and ..
+          if (ent->d_name[0] == '.') continue;
+
+          // Build our filename
+          std::string logfilename(in.c_str());
+          logfilename.push_back('/');
+          logfilename.append(ent->d_name);
+
+          futures.emplace(std::async(std::launch::async, [input_creator, generator, logfilename]() -> uint64_t {
+            uint64_t processed_lines = 0;
+            std::unique_ptr<Input> input(input_creator(generator));
+            // Open the file, loop through it and pass every line to our input analyzer
+            std::ifstream logfile(logfilename);
+            for (std::string line; std::getline(logfile, line); ++processed_lines) {
+              try {
+                input->process(line, logfilename);
+              } catch (const std::exception &error) {
+                std::cerr << error.what() << std::endl;
+              };
+            }
+            return processed_lines;
+          }));
+        }
+        closedir(dir);
+      };
+    } else
+      std::cerr << in << " is not a file or a directory." << std::endl;
   };
 
   uint64_t processed_lines = 0;
