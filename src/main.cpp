@@ -23,6 +23,7 @@ static const struct option g_LongOpts[] = {
   { "input",        required_argument, 0, 'i' },
   { "analyzer",     required_argument, 0, 'a' },
   { "template",     required_argument, 0, 't' },
+  { "output",       required_argument, 0, 'o' },
   { 0, 0, 0, 0 }
 };
 
@@ -32,6 +33,7 @@ static int usage(const char *prog) {
             << "-I, --input-module The input module to use" << std::endl
             << "-i, --input        Input file/folder, repeat for multiple files/folders" << std::endl
             << "-t, --template     Use this template to generate our output" << std::endl
+            << "-o, --output       Output file for the generated output" << std::endl
             << "-a, --analyzer     Load this analyzer and use it for our output" << std::endl;
   return 1;
 };
@@ -39,6 +41,7 @@ static int usage(const char *prog) {
 int main(int argc, char **argv) {
   std::vector<std::string> input;
   std::unique_ptr<SmartTpl::Source> tplsource;
+  std::string outputfile;
 
   void *input_handle = nullptr;
   typedef Input* (InputCreator)(const std::shared_ptr<Generator> &generator);
@@ -47,7 +50,7 @@ int main(int argc, char **argv) {
   std::shared_ptr<Generator> generator(new Generator());
 
   int arg, optindex;
-  while ((arg = getopt_long(argc, argv, "hI:i:a:t:", g_LongOpts, &optindex)) != -1) {
+  while ((arg = getopt_long(argc, argv, "hI:i:a:t:o:", g_LongOpts, &optindex)) != -1) {
     switch (arg) {
     case 'h':
       return usage(argv[0]);
@@ -88,6 +91,9 @@ int main(int argc, char **argv) {
     case 't':
       tplsource.reset(new SmartTpl::File(optarg));
       break;
+    case 'o':
+      outputfile = optarg;
+      break;
     };
   };
 
@@ -103,6 +109,11 @@ int main(int argc, char **argv) {
 
   if (!tplsource) {
     std::cerr << "No template specified" << std::endl;
+    return 1;
+  };
+
+  if (outputfile.empty()) {
+    std::cerr << "No output file specified" << std::endl;
     return 1;
   };
 
@@ -191,6 +202,15 @@ int main(int argc, char **argv) {
 
   SmartTpl::Template tpl(*tplsource);
 
-  std::cout << tpl.process(SmartTpl::Data(output)) << std::endl;
+  std::ofstream outstream(outputfile);
+
+  if (!outstream.is_open()) {
+    std::cerr << strerror(errno) << std::endl;
+    return 1;
+  };
+
+  outstream << tpl.process(SmartTpl::Data(output));
+
+  outstream.close();
   return 0;
 }
