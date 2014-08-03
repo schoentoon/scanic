@@ -6,6 +6,8 @@
 #include <queue>
 #include <list>
 
+#include <smarttpl.h>
+
 #include <sys/stat.h>
 #include <string.h>
 #include <dirent.h>
@@ -20,6 +22,7 @@ static const struct option g_LongOpts[] = {
   { "input-module", required_argument, 0, 'I' },
   { "input",        required_argument, 0, 'i' },
   { "analyzer",     required_argument, 0, 'a' },
+  { "template",     required_argument, 0, 't' },
   { 0, 0, 0, 0 }
 };
 
@@ -28,12 +31,14 @@ static int usage(const char *prog) {
             << "-h, --help         Show this help message" << std::endl
             << "-I, --input-module The input module to use" << std::endl
             << "-i, --input        Input file/folder, repeat for multiple files/folders" << std::endl
+            << "-t, --template     Use this template to generate our output" << std::endl
             << "-a, --analyzer     Load this analyzer and use it for our output" << std::endl;
   return 1;
 };
 
 int main(int argc, char **argv) {
   std::vector<std::string> input;
+  std::unique_ptr<SmartTpl::Source> tplsource;
 
   void *input_handle = nullptr;
   typedef Input* (InputCreator)(const std::shared_ptr<Generator> &generator);
@@ -42,7 +47,7 @@ int main(int argc, char **argv) {
   std::shared_ptr<Generator> generator(new Generator());
 
   int arg, optindex;
-  while ((arg = getopt_long(argc, argv, "hI:i:a:", g_LongOpts, &optindex)) != -1) {
+  while ((arg = getopt_long(argc, argv, "hI:i:a:t:", g_LongOpts, &optindex)) != -1) {
     switch (arg) {
     case 'h':
       return usage(argv[0]);
@@ -80,6 +85,9 @@ int main(int argc, char **argv) {
       generator->loadAnalyzer(func(handle));
       break;
     };
+    case 't':
+      tplsource.reset(new SmartTpl::File(optarg));
+      break;
     };
   };
 
@@ -90,6 +98,11 @@ int main(int argc, char **argv) {
 
   if (input_handle == nullptr || input_creator == nullptr) {
     std::cerr << "No input module found, can't continue." << std::endl;
+    return 1;
+  };
+
+  if (!tplsource) {
+    std::cerr << "No template specified" << std::endl;
     return 1;
   };
 
@@ -175,5 +188,9 @@ int main(int argc, char **argv) {
 
   std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
   std::cerr << "Processed " << processed_lines << " lines in " << elapsed_seconds.count() << " seconds. " << std::endl;
+
+  SmartTpl::Template tpl(*tplsource);
+
+  std::cout << tpl.process(SmartTpl::Data(output)) << std::endl;
   return 0;
 }
