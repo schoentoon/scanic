@@ -39,7 +39,7 @@ static int usage(const char *prog) {
 };
 
 int main(int argc, char **argv) {
-  std::vector<std::string> input;
+  std::list<std::string> input;
   std::unique_ptr<SmartTpl::Source> tplsource;
   std::string outputfile;
 
@@ -156,20 +156,24 @@ int main(int argc, char **argv) {
           logfilename.push_back('/');
           logfilename.append(ent->d_name);
 
-          futures.emplace(std::async(std::launch::async, [input_creator, generator, logfilename]() -> uint64_t {
-            uint64_t processed_lines = 0;
-            std::unique_ptr<Input> input(input_creator(generator));
-            // Open the file, loop through it and pass every line to our input analyzer
-            std::ifstream logfile(logfilename);
-            for (std::string line; std::getline(logfile, line); ++processed_lines) {
-              try {
-                input->process(line, logfilename);
-              } catch (const std::exception &error) {
-                std::cerr << error.what() << std::endl;
-              };
-            }
-            return processed_lines;
-          }));
+          if (stat(in.c_str(), &st_buf) == 0) {
+            if (S_ISREG(st_buf.st_mode)) {
+              futures.emplace(std::async(std::launch::async, [input_creator, generator, logfilename]() -> uint64_t {
+                uint64_t processed_lines = 0;
+                std::unique_ptr<Input> input(input_creator(generator));
+                // Open the file, loop through it and pass every line to our input analyzer
+                std::ifstream logfile(logfilename);
+                for (std::string line; std::getline(logfile, line); ++processed_lines) {
+                  try {
+                    input->process(line, logfilename);
+                  } catch (const std::exception &error) {
+                    std::cerr << error.what() << std::endl;
+                  };
+                }
+                return processed_lines;
+              }));
+            } else if (S_ISDIR(st_buf.st_mode)) input.push_back(logfilename);
+          };
         }
         closedir(dir);
       };
