@@ -20,16 +20,16 @@ inputs:
 analyzers:
 	mkdir analyzers
 
-build/%.o: src/%.cpp include/%.h build
+build/%.o: src/%.cpp include/%.h
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -c $< -o $@
 
-inputs/%.so: src/inputs/%.cpp inputs
+inputs/%.so: src/inputs/%.cpp
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -shared $< -o $@
 
-analyzers/%.so: src/analyzers/%.cpp analyzers
+analyzers/%.so: src/analyzers/%.cpp
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -shared $< -o $@
 
-$(BINARY): $(DEPS) src/main.cpp
+$(BINARY): build inputs analyzers $(DEPS) src/main.cpp
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -o $(BINARY) src/main.cpp $(DEPS) $(LDFLAGS)
 
 .PHONY: clean
