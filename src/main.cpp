@@ -24,6 +24,7 @@ static const struct option g_LongOpts[] = {
   { "analyzer",     required_argument, 0, 'a' },
   { "template",     required_argument, 0, 't' },
   { "output",       required_argument, 0, 'o' },
+  { "no-threads",   no_argument,       0, 'T' },
   { 0, 0, 0, 0 }
 };
 
@@ -34,7 +35,8 @@ static int usage(const char *prog) {
             << "-i, --input        Input file/folder, repeat for multiple files/folders" << std::endl
             << "-t, --template     Use this template to generate our output" << std::endl
             << "-o, --output       Output file for the generated output" << std::endl
-            << "-a, --analyzer     Load this analyzer and use it for our output" << std::endl;
+            << "-a, --analyzer     Load this analyzer and use it for our output" << std::endl
+            << "-T, --no-threads   Launch with less/no threads." << std::endl;
   return 1;
 };
 
@@ -46,11 +48,12 @@ int main(int argc, char **argv) {
   void *input_handle = nullptr;
   typedef Input* (InputCreator)(const std::shared_ptr<Generator> &generator);
   InputCreator *input_creator = nullptr;
+  bool no_threads = false;
 
   std::shared_ptr<Generator> generator(new Generator());
 
   int arg, optindex;
-  while ((arg = getopt_long(argc, argv, "hI:i:a:t:o:", g_LongOpts, &optindex)) != -1) {
+  while ((arg = getopt_long(argc, argv, "hI:i:a:t:o:T", g_LongOpts, &optindex)) != -1) {
     switch (arg) {
     case 'h':
       return usage(argv[0]);
@@ -94,6 +97,9 @@ int main(int argc, char **argv) {
     case 'o':
       outputfile = optarg;
       break;
+    case 'T':
+      no_threads = true;
+      break;
     };
   };
 
@@ -129,7 +135,7 @@ int main(int argc, char **argv) {
     };
 
     if (S_ISREG(st_buf.st_mode)) {
-      futures.emplace(std::async(std::launch::async, [input_creator, generator, in]() -> uint64_t {
+      auto func = [input_creator, generator, in]() -> uint64_t {
         uint64_t processed_lines = 0;
         std::unique_ptr<Input> input(input_creator(generator));
         // Open the file, loop through it and pass every line to our input analyzer
@@ -142,7 +148,12 @@ int main(int argc, char **argv) {
           };
         }
         return processed_lines;
-      }));
+      };
+      if (no_threads) {
+        std::packaged_task<uint64_t()> task(func);
+        futures.push(std::move(task.get_future()));
+        task();
+      } else futures.emplace(std::async(std::launch::async, func));
     } else if (S_ISDIR(st_buf.st_mode)) {
       DIR *dir = nullptr;
       struct dirent *ent;
@@ -158,7 +169,7 @@ int main(int argc, char **argv) {
 
           if (stat(in.c_str(), &st_buf) == 0) {
             if (S_ISREG(st_buf.st_mode)) {
-              futures.emplace(std::async(std::launch::async, [input_creator, generator, logfilename]() -> uint64_t {
+              auto func = [input_creator, generator, logfilename]() -> uint64_t {
                 uint64_t processed_lines = 0;
                 std::unique_ptr<Input> input(input_creator(generator));
                 // Open the file, loop through it and pass every line to our input analyzer
@@ -171,7 +182,12 @@ int main(int argc, char **argv) {
                   };
                 }
                 return processed_lines;
-              }));
+              };
+              if (no_threads) {
+                std::packaged_task<uint64_t()> task(func);
+                futures.push(std::move(task.get_future()));
+                task();
+              } else futures.emplace(std::async(std::launch::async, func));
             } else if (S_ISDIR(st_buf.st_mode)) input.push_back(logfilename);
           };
         }
