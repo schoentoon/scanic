@@ -86,5 +86,5 @@ public:
    */
   void loadAnalyzer(Analyzer *analyzer);
 
-  Variant::Value analyze();
+  Variant::Value analyze(bool no_threads);
 };

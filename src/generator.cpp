@@ -1,5 +1,8 @@
 #include "generator.h"
 
+#include <future>
+#include <queue>
+
 #include <dlfcn.h>
 
 #include "input.h"
@@ -18,14 +21,31 @@ std::chrono::duration<double> Generator::sort() {
   return std::chrono::system_clock::now() - start;
 };
 
-Variant::Value Generator::analyze() {
+Variant::Value Generator::analyze(bool no_threads) {
+  std::queue<std::future<std::tuple<std::string, Variant::Value, double>>> futures;
   std::map<std::string, Variant::Value> output;
   for (auto &analyzer : _analyzers) {
-    std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
-    analyzer->analyze(*this);
-    output[analyzer->name()] = analyzer->analyze(*this);
-    std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
-    output["timing"][analyzer->name()] = elapsed_seconds.count();
+    auto func = [&analyzer, this]() {
+      std::tuple<std::string, Variant::Value, double> output;
+      std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
+      std::get<0>(output) = analyzer->name();
+      std::get<1>(output) = analyzer->analyze(*this);
+      std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
+      std::get<2>(output) = elapsed_seconds.count();
+      return output;
+    };
+    if (no_threads) {
+      std::packaged_task<std::tuple<std::string, Variant::Value, double>()> task(func);
+      futures.push(std::move(task.get_future()));
+      task();
+    } else futures.emplace(std::async(std::launch::async, func));
+  };
+  while (!futures.empty()) {
+    auto &future = futures.front();
+    auto ret = future.get();
+    output[std::get<0>(ret)] = std::get<1>(ret);
+    output["timing"][std::get<0>(ret)] = std::get<2>(ret);
+    futures.pop();
   };
   return output;
 };

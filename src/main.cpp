@@ -213,7 +213,7 @@ int main(int argc, char **argv) {
   auto sorttime = generator->sort();
   std::cerr << "Sorting took about " << sorttime.count() << " seconds." << std::endl;
 
-  auto output = generator->analyze();
+  auto output = generator->analyze(no_threads);
 
   std::cerr << output.toJsonString() << std::endl;
 
