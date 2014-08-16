@@ -22,11 +22,12 @@ std::chrono::duration<double> Generator::sort() {
 };
 
 Variant::Value Generator::analyze(bool no_threads) {
-  std::queue<std::future<std::tuple<std::string, Variant::Value, double>>> futures;
+  using AnalyzeData = std::tuple<std::string, Variant::Value, double>;
+  std::queue<std::future<AnalyzeData>> futures;
   std::map<std::string, Variant::Value> output;
   for (auto &analyzer : _analyzers) {
     auto func = [&analyzer, this]() {
-      std::tuple<std::string, Variant::Value, double> output;
+      AnalyzeData output;
       std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
       std::get<0>(output) = analyzer->name();
       std::get<1>(output) = analyzer->analyze(*this);
@@ -35,7 +36,7 @@ Variant::Value Generator::analyze(bool no_threads) {
       return output;
     };
     if (no_threads) {
-      std::packaged_task<std::tuple<std::string, Variant::Value, double>()> task(func);
+      std::packaged_task<AnalyzeData()> task(func);
       futures.push(std::move(task.get_future()));
       task();
     } else futures.emplace(std::async(std::launch::async, func));
