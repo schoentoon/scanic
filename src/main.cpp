@@ -77,18 +77,51 @@ int main(int argc, char **argv) {
       input.emplace_back(optarg);
       break;
     case 'a': {
-      void *handle = dlopen(optarg, RTLD_NOW);
-      if (handle == nullptr) {
-        std::cerr << dlerror() << std::endl;
+      struct stat st_buf;
+      if (stat(optarg, &st_buf) != 0) {
+        std::cerr << strerror(errno) << std::endl;
         return 1;
       };
-      typedef Analyzer* (AnalyzerCreator)(void *handle);
-      AnalyzerCreator* func = (AnalyzerCreator*) dlsym(handle, "loadAnalyzer");
-      if (func == nullptr) {
-        std::cerr << dlerror() << std::endl;
-        return 1;
+
+      if (S_ISREG(st_buf.st_mode)) {
+        void *handle = dlopen(optarg, RTLD_NOW);
+        if (handle == nullptr) {
+          std::cerr << dlerror() << std::endl;
+          return 1;
+        };
+        typedef Analyzer* (AnalyzerCreator)(void *handle);
+        AnalyzerCreator* func = (AnalyzerCreator*) dlsym(handle, "loadAnalyzer");
+        if (func == nullptr) {
+          std::cerr << dlerror() << std::endl;
+          return 1;
+        };
+        generator->loadAnalyzer(func(handle));
+      } else if (S_ISDIR(st_buf.st_mode)) {
+        struct dirent *ent;
+        DIR *dir = nullptr;
+        if ((dir = opendir(optarg)) != nullptr) {
+          while ((ent = readdir(dir)) != nullptr) {
+            // Skip hidden files and . and ..
+            if (ent->d_name[0] == '.') continue;
+
+            std::string file(optarg);
+            file.push_back('/');
+            file.append(ent->d_name);
+            void *handle = dlopen(file.c_str(), RTLD_NOW);
+            if (handle == nullptr) {
+              std::cerr << dlerror() << std::endl;
+              return 1;
+            };
+            typedef Analyzer* (AnalyzerCreator)(void *handle);
+            AnalyzerCreator* func = (AnalyzerCreator*) dlsym(handle, "loadAnalyzer");
+            if (func == nullptr) {
+              std::cerr << dlerror() << std::endl;
+              return 1;
+            };
+            generator->loadAnalyzer(func(handle));
+          };
+        };
       };
-      generator->loadAnalyzer(func(handle));
       break;
     };
     case 't':
@@ -158,7 +191,7 @@ int main(int argc, char **argv) {
       DIR *dir = nullptr;
       struct dirent *ent;
       if ((dir = opendir(in.c_str())) != nullptr) {
-        while ((ent = readdir (dir)) != nullptr) {
+        while ((ent = readdir(dir)) != nullptr) {
           // Skip hidden files and . and ..
           if (ent->d_name[0] == '.') continue;
 
