@@ -14,7 +14,9 @@
 #include "message.h"
 #include "generator.h"
 
-#define INPUTMODULE(classname) extern "C" Input* loadInput(const std::shared_ptr<Generator> &generator) { return new classname(generator); }
+#define INPUTMODULE(classname) extern "C" Scanic::Input* loadInput(const std::shared_ptr<Scanic::Generator> &generator) { return new classname(generator); }
+
+namespace Scanic {
 
 class Input {
 private:
@@ -101,4 +103,6 @@ public:
    * Implement this method to add support for your own logfiles
    */
   virtual void process(const std::string &input, const std::string &path) = 0;
+};
+
 };

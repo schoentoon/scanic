@@ -11,6 +11,8 @@
 
 #include "generator.h"
 
+namespace Scanic {
+
 class LineCountAnalyzer : public Analyzer {
 public:
   LineCountAnalyzer(void *handle) : Analyzer(handle) {};
@@ -34,4 +36,6 @@ public:
   };
 };
 
-ANALYZEMODULE(LineCountAnalyzer);
+};
+
+ANALYZEMODULE(Scanic::LineCountAnalyzer);

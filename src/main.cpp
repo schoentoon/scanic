@@ -49,6 +49,8 @@ static int usage(const char *prog) {
   return 1;
 };
 
+using namespace Scanic;
+
 int main(int argc, char **argv) {
   std::list<std::string> input;
   std::unique_ptr<SmartTpl::Source> tplsource;

@@ -13,6 +13,8 @@
 #include <iomanip>
 #include <stdexcept>
 
+namespace Scanic {
+
 class ZncInput : public Input {
 public:
   ZncInput(const std::shared_ptr<Generator> &generator)
@@ -110,4 +112,6 @@ public:
   };
 };
 
-INPUTMODULE(ZncInput);
+};
+
+INPUTMODULE(Scanic::ZncInput);

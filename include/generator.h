@@ -24,6 +24,8 @@
 #include "kick.h"
 #include "nickchange.h"
 
+namespace Scanic {
+
 /**
  * Forward declaration
  */
@@ -96,4 +98,6 @@ public:
   void loadAnalyzer(Analyzer *analyzer);
 
   Variant::Value analyze(bool no_threads);
+};
+
 };

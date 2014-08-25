@@ -11,10 +11,14 @@
 
 #include <iostream>
 
+namespace Scanic {
+
 Input::Input(const std::shared_ptr<Generator> &generator)
 : _generator(generator) {
 };
 
 Input::~Input() {
   _generator->insertInput(this);
+};
+
 };

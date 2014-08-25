@@ -11,4 +11,8 @@
 
 #include "quit.h"
 
+namespace Scanic {
+
 using PartEvent = QuitEvent;
+
+};

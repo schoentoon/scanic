@@ -16,6 +16,8 @@
 
 #include "input.h"
 
+namespace Scanic {
+
 Generator::Generator() {
 };
 
@@ -76,4 +78,6 @@ void Generator::loadAnalyzer(Analyzer* analyzer) {
     delete analyzer;
     dlclose(handle);
   });
+};
+
 };

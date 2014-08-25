@@ -11,6 +11,8 @@
 
 #include "event.h"
 
+namespace Scanic {
+
 class Message : public Event {
 private:
 
@@ -54,4 +56,6 @@ public:
     _action = action;
     return *this;
   };
+};
+
 };

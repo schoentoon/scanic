@@ -11,6 +11,8 @@
 
 #include "event.h"
 
+namespace Scanic {
+
 class KickEvent : public Event {
 private:
   /**
@@ -65,4 +67,6 @@ public:
     _message = std::move(message);
     return *this;
   };
+};
+
 };

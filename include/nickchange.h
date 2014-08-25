@@ -9,9 +9,9 @@
 
 #pragma once
 
-#pragma once
-
 #include "event.h"
+
+namespace Scanic {
 
 class NickChangeEvent : public Event {
 private:
@@ -51,4 +51,6 @@ public:
     _new_username = std::move(new_username);
     return *this;
   };
+};
+
 };

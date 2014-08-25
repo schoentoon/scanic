@@ -11,6 +11,8 @@
 
 #include "event.h"
 
+namespace Scanic {
+
 class JoinEvent : public Event {
 private:
   /**
@@ -33,4 +35,6 @@ public:
     _username = std::move(username);
     return *this;
   };
+};
+
 };

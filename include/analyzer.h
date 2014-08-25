@@ -11,7 +11,9 @@
 
 #include <variant.h>
 
-#define ANALYZEMODULE(classname) extern "C" Analyzer* loadAnalyzer(void *handle) { return new classname(handle); }
+#define ANALYZEMODULE(classname) extern "C" Scanic::Analyzer* loadAnalyzer(void *handle) { return new classname(handle); }
+
+namespace Scanic {
 
 class Generator;
 
@@ -39,4 +41,6 @@ public:
    *  Override this method to actually analyze the data
    */
   virtual std::map<std::string, Variant::Value> analyze(const Generator &generator) = 0;
+};
+
 };

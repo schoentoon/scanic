@@ -11,6 +11,8 @@
 
 #include "event.h"
 
+namespace Scanic {
+
 class QuitEvent : public Event {
 private:
   /**
@@ -49,4 +51,6 @@ public:
     _message = std::move(message);
     return *this;
   };
+};
+
 };

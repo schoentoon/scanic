@@ -13,6 +13,8 @@
 #include <string>
 #include <functional>
 
+namespace Scanic {
+
 class Event {
 public:
   /**
@@ -42,4 +44,6 @@ public:
   void time(std::time_t time) {
     _time = time;
   };
+};
+
 };
