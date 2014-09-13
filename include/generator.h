@@ -97,7 +97,7 @@ public:
    */
   void loadAnalyzer(Analyzer *analyzer);
 
-  Variant::Value analyze(bool no_threads);
+  SmartTpl::Data analyze(bool no_threads);
 };
 
 };

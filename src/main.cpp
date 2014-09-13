@@ -259,8 +259,6 @@ int main(int argc, char **argv) {
 
   auto output = generator->analyze(no_threads);
 
-  std::cerr << output.toJsonString() << std::endl;
-
   std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
   std::cerr << "Processed " << processed_lines << " lines in " << elapsed_seconds.count() << " seconds. " << std::endl;
 

@@ -9,7 +9,9 @@
 
 #pragma once
 
-#include <variant.h>
+#include <map>
+#include <memory>
+#include <smarttpl.h>
 
 #define ANALYZEMODULE(classname) extern "C" Scanic::Analyzer* loadAnalyzer(void *handle) { return new classname(handle); }
 
@@ -40,7 +42,7 @@ public:
   /**
    *  Override this method to actually analyze the data
    */
-  virtual std::map<std::string, Variant::Value> analyze(const Generator &generator) = 0;
+  virtual std::shared_ptr<SmartTpl::Value> analyze(const Generator &generator) = 0;
 };
 
 };

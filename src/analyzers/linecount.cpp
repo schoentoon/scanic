@@ -25,14 +25,14 @@ public:
   /**
    *  Override this method to actually analyze the data
    */
-  std::map<std::string, Variant::Value> analyze(const Generator &generator) {
+  std::shared_ptr<SmartTpl::Value> analyze(const Generator &generator) {
     std::map<std::string, int64_t> lines;
     for (auto &msg : generator.messages()) ++lines[msg.author()];
 
-    std::map<std::string, Variant::Value> output;
-    for (auto &l : lines) output[l.first] = l.second;
+    std::map<std::string, SmartTpl::VariantValue> output;
+    for (auto &l : lines) output.insert(std::make_pair(l.first, l.second));
 
-    return output;
+    return std::shared_ptr<SmartTpl::Value>(new SmartTpl::VariantValue(std::move(output)));
   };
 };
 

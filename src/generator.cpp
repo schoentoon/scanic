@@ -32,10 +32,10 @@ std::chrono::duration<double> Generator::sort() {
   return std::chrono::system_clock::now() - start;
 };
 
-Variant::Value Generator::analyze(bool no_threads) {
-  using AnalyzeData = std::tuple<std::string, Variant::Value, double>;
+SmartTpl::Data Generator::analyze(bool no_threads) {
+  using AnalyzeData = std::tuple<std::string, std::shared_ptr<SmartTpl::Value>, double>;
   std::queue<std::future<AnalyzeData>> futures;
-  std::map<std::string, Variant::Value> output;
+  SmartTpl::Data output;
   for (auto &analyzer : _analyzers) {
     auto func = [&analyzer, this]() {
       AnalyzeData output;
@@ -52,13 +52,15 @@ Variant::Value Generator::analyze(bool no_threads) {
       task();
     } else futures.emplace(std::async(std::launch::async, func));
   };
+  std::map<std::string, SmartTpl::VariantValue> timings;
   while (!futures.empty()) {
     auto &future = futures.front();
     auto ret = future.get();
-    output[std::get<0>(ret)] = std::get<1>(ret);
-    output["timing"][std::get<0>(ret)] = std::get<2>(ret);
+    output.assignManaged(std::get<0>(ret), std::get<1>(ret));
+    timings.insert(std::make_pair(std::get<0>(ret), std::get<2>(ret)));
     futures.pop();
   };
+  output.assign("timing", timings);
   return output;
 };
 
