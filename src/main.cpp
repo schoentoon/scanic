@@ -148,23 +148,23 @@ int main(int argc, char **argv) {
   };
 
   if (input.empty()) {
-    std::cerr << "No input files/folders, can't continue." << std::endl;
-    return 1;
+    std::cerr << "No input files/folders, can't continue." << std::endl << std::endl;
+    return usage(argv[0]);
   };
 
   if (input_handle == nullptr || input_creator == nullptr) {
-    std::cerr << "No input module found, can't continue." << std::endl;
-    return 1;
+    std::cerr << "No input module found, can't continue." << std::endl << std::endl;
+    return usage(argv[0]);
   };
 
   if (!tplsource) {
-    std::cerr << "No template specified" << std::endl;
-    return 1;
+    std::cerr << "No template specified" << std::endl << std::endl;
+    return usage(argv[0]);
   };
 
   if (outputfile.empty()) {
-    std::cerr << "No output file specified" << std::endl;
-    return 1;
+    std::cerr << "No output file specified" << std::endl << std::endl;
+    return usage(argv[0]);
   };
 
   std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
@@ -264,15 +264,19 @@ int main(int argc, char **argv) {
 
   SmartTpl::Template tpl(*tplsource);
 
-  std::ofstream outstream(outputfile);
+  if (outputfile == "-") {
+    std::cout << tpl.process(output);
+  } else {
+    std::ofstream outstream(outputfile);
 
-  if (!outstream.is_open()) {
-    std::cerr << strerror(errno) << std::endl;
-    return 1;
-  };
+    if (!outstream.is_open()) {
+      std::cerr << strerror(errno) << std::endl;
+      return 1;
+    };
 
-  outstream << tpl.process(SmartTpl::Data(output));
+    outstream << tpl.process(output);
+    outstream.close();
+  }
 
-  outstream.close();
   return 0;
 }
