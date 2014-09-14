@@ -254,8 +254,10 @@ int main(int argc, char **argv) {
   input_handle = nullptr;
   input_creator = nullptr;
 
-  auto sorttime = generator->sort();
-  std::cerr << "Sorting took about " << sorttime.count() << " seconds." << std::endl;
+  if (generator->requiresSorting()) {
+    auto sorttime = generator->sort();
+    std::cerr << "Sorting took about " << sorttime.count() << " seconds." << std::endl;
+  }
 
   auto output = generator->analyze(no_threads);
 

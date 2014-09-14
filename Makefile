@@ -23,10 +23,10 @@ analyzers:
 build/%.o: src/%.cpp include/%.h
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -c $< -o $@
 
-inputs/%.so: src/inputs/%.cpp
+inputs/%.so: src/inputs/%.cpp inputs
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -shared $< -o $@
 
-analyzers/%.so: src/analyzers/%.cpp
+analyzers/%.so: src/analyzers/%.cpp analyzers
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -shared $< -o $@
 
 $(BINARY): build $(DEPS) src/main.cpp

@@ -98,6 +98,13 @@ public:
   void loadAnalyzer(Analyzer *analyzer);
 
   SmartTpl::Data analyze(bool no_threads);
+
+  bool requiresSorting() {
+    for (auto &analyzer : _analyzers) {
+      if (analyzer->requiresSorting()) return true;
+    }
+    return false;
+  };
 };
 
 };
