@@ -41,6 +41,16 @@ public:
   , _message(std::move(message))
   , _author() {
   };
+  Message(const std::string &message, const std::string &author)
+  : Event()
+  , _message(message)
+  , _author(author) {
+  };
+  Message(std::string &&message, std::string &&author)
+  : Event()
+  , _message(std::move(message))
+  , _author(std::move(author)) {
+  };
   Message()
   : Event()
   , _message()
