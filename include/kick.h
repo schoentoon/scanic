@@ -30,13 +30,20 @@ private:
    */
   std::string _message;
 public:
-  KickEvent() : Event() {};
+  KickEvent()
+  : Event()
+  , _username()
+  , _kicker()
+  , _message() {
+  };
   KickEvent(std::tm &&when, std::string &&username, std::string &&kicker, std::string &&msg = "")
   : Event(std::move(when))
   , _username(std::move(username))
   , _kicker(std::move(kicker))
   , _message(std::move(msg)) {
   };
+
+  virtual ~KickEvent() {};
 
   const std::string username() const { return _username; };
   KickEvent& username(const std::string &username) {

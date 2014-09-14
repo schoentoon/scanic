@@ -14,7 +14,14 @@
 namespace Scanic {
 
 Input::Input(const std::shared_ptr<Generator> &generator)
-: _generator(generator) {
+: _generator(generator)
+, _messages()
+, _joins()
+, _quits()
+, _parts()
+, _kicks()
+, _nick_changes()
+, _analyzers() {
 };
 
 Input::~Input() {

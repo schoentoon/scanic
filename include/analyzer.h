@@ -33,6 +33,8 @@ private:
 
 public:
   Analyzer(void *handle);
+  Analyzer(const Analyzer& that) = delete;
+  Analyzer* operator=(const Analyzer& that) = delete;
   virtual ~Analyzer();
   /**
    *  Return the name of your analyzer

@@ -20,11 +20,16 @@ private:
    */
   std::string _username;
 public:
-  JoinEvent() : Event() {};
+  JoinEvent()
+  : Event()
+  , _username() {
+  };
   JoinEvent(std::tm &&when, std::string &&username)
   : Event(std::move(when))
   , _username(std::move(username)) {
   };
+
+  virtual ~JoinEvent() {};
 
   const std::string username() const { return _username; };
   JoinEvent& username(const std::string &username) {

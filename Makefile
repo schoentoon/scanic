@@ -1,4 +1,4 @@
-override CXXFLAGS += -std=c++11 -g -Wall -O2 -pipe -fPIE -Wl,--export-dynamic
+override CXXFLAGS += -std=c++11 -g -Wall -O2 -pipe -fPIE -Wl,--export-dynamic -Weffc++
 INC               += -Iinclude -Iinclude/analyzers
 LDFLAGS           := -lsmarttpl -pthread -ldl
 CC                := cc
@@ -29,7 +29,7 @@ inputs/%.so: src/inputs/%.cpp
 analyzers/%.so: src/analyzers/%.cpp
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -shared $< -o $@
 
-$(BINARY): build inputs analyzers $(DEPS) src/main.cpp
+$(BINARY): build $(DEPS) src/main.cpp
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -o $(BINARY) src/main.cpp $(DEPS) $(LDFLAGS)
 
 .PHONY: clean

@@ -18,7 +18,15 @@
 
 namespace Scanic {
 
-Generator::Generator() {
+Generator::Generator()
+: _messages()
+, _joins()
+, _quits()
+, _parts()
+, _kicks()
+, _nick_changes()
+, _lock()
+, _analyzers() {
 };
 
 std::chrono::duration<double> Generator::sort() {
@@ -34,6 +42,11 @@ std::chrono::duration<double> Generator::sort() {
 
 SmartTpl::Data Generator::analyze(bool no_threads) {
   struct AnalyzeData {
+    AnalyzeData(const std::string& analyzer_name)
+    : name(analyzer_name)
+    , data()
+    , duration(0.0) {
+    };
     std::string name;
     std::shared_ptr<SmartTpl::Value> data;
     double duration;
@@ -42,9 +55,8 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
   SmartTpl::Data output;
   for (auto &analyzer : _analyzers) {
     auto func = [&analyzer, this]() {
-      AnalyzeData output;
+      AnalyzeData output(analyzer->name());
       std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
-      output.name = analyzer->name();
       output.data = analyzer->analyze(*this);
       std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
       output.duration = elapsed_seconds.count();

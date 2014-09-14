@@ -25,12 +25,18 @@ private:
    */
   std::string _message;
 public:
-  QuitEvent() : Event() {};
+  QuitEvent()
+  : Event()
+  , _username()
+  , _message() {
+  };
   QuitEvent(std::tm &&when, std::string &&username, std::string &&msg = "")
   : Event(std::move(when))
   , _username(std::move(username))
   , _message(std::move(msg)) {
   };
+
+  virtual ~QuitEvent() {};
 
   const std::string username() const { return _username; };
   QuitEvent& username(const std::string &username) {

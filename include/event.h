@@ -37,6 +37,8 @@ public:
 
   Event() : _time(0) {};
 
+  virtual ~Event() {};
+
   const std::time_t time() const { return _time; };
   void time(std::tm time) {
     _time = std::mktime(&time);

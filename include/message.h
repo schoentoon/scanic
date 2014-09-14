@@ -31,6 +31,24 @@ private:
    */
   bool _action = false;
 public:
+  Message(const std::string &message)
+  : Event()
+  , _message(message)
+  , _author() {
+  };
+  Message(std::string &&message)
+  : Event()
+  , _message(std::move(message))
+  , _author() {
+  };
+  Message()
+  : Event()
+  , _message()
+  , _author() {
+  };
+
+  virtual ~Message() {};
+
   const std::string message() const { return _message; };
   Message& message(const std::string &message) {
     _message = message;

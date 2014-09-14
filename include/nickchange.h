@@ -25,12 +25,18 @@ private:
    */
   std::string _new_username;
 public:
-  NickChangeEvent() : Event() {};
+  NickChangeEvent()
+  : Event()
+  , _original_username()
+  , _new_username() {
+  };
   NickChangeEvent(std::tm &&when, std::string &&original_username, std::string &&new_username)
   : Event(std::move(when))
   , _original_username(std::move(original_username))
   , _new_username(std::move(new_username)) {
   };
+
+  virtual ~NickChangeEvent() {};
 
   const std::string originalUsername() const { return _original_username; };
   NickChangeEvent& originalUsername(const std::string &original_username) {
