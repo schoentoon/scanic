@@ -41,25 +41,27 @@ std::chrono::duration<double> Generator::sort() {
 };
 
 SmartTpl::Data Generator::analyze(bool no_threads) {
+
   struct AnalyzeData {
     AnalyzeData(const std::string& analyzer_name)
-    : name(analyzer_name)
-    , data()
-    , duration(0.0) {
+    : _name(analyzer_name)
+    , _data()
+    , _duration(0.0) {
     };
-    std::string name;
-    std::shared_ptr<SmartTpl::Value> data;
-    double duration;
+    std::string _name;
+    std::shared_ptr<SmartTpl::Value> _data;
+    double _duration;
   };
+
   std::queue<std::future<AnalyzeData>> futures;
   SmartTpl::Data output;
   for (auto &analyzer : _analyzers) {
     auto func = [&analyzer, this]() {
       AnalyzeData output(analyzer->name());
       std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
-      output.data = analyzer->analyze(*this);
+      output._data = analyzer->analyze(*this);
       std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
-      output.duration = elapsed_seconds.count();
+      output._duration = elapsed_seconds.count();
       return output;
     };
     if (no_threads) {
@@ -72,8 +74,8 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
   while (!futures.empty()) {
     auto &future = futures.front();
     auto ret = future.get();
-    output.assignManaged(ret.name, ret.data);
-    timings.insert(std::make_pair(ret.name, ret.duration));
+    output.assignManaged(ret._name, ret._data);
+    timings.insert(std::make_pair(ret._name, ret._duration));
     futures.pop();
   };
   output.assign("timing", timings);
