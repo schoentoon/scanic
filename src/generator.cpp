@@ -43,10 +43,14 @@ std::chrono::duration<double> Generator::sort() {
 SmartTpl::Data Generator::analyze(bool no_threads) {
 
   struct AnalyzeData {
-    AnalyzeData(const std::string& analyzer_name)
-    : _name(analyzer_name)
+    AnalyzeData(Analyzer *analyzer, Generator &generator)
+    : _name(analyzer->name())
     , _data()
     , _duration(0.0) {
+      std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
+      _data = analyzer->analyze(generator);
+      std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
+      _duration = elapsed_seconds.count();
     };
     std::string _name;
     std::shared_ptr<SmartTpl::Value> _data;
@@ -57,11 +61,7 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
   SmartTpl::Data output;
   for (auto &analyzer : _analyzers) {
     auto func = [&analyzer, this]() {
-      AnalyzeData output(analyzer->name());
-      std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
-      output._data = analyzer->analyze(*this);
-      std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
-      output._duration = elapsed_seconds.count();
+      AnalyzeData output(analyzer.get(), *this);
       return output;
     };
     if (no_threads) {
