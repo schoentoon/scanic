@@ -15,7 +15,6 @@ namespace Scanic {
 
 class Message : public Event {
 private:
-
   /**
    * The actual message
    */

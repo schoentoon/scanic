@@ -1,4 +1,5 @@
-/* * -----------------------------------------------------------------------------
+/* *
+ * -----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * Toon Schoenmakers <nighteyes1993@gmail.com>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -13,14 +14,12 @@
 
 namespace Scanic {
 
-Analyzer::Analyzer(void* handle)
-: _handle(handle) {
-};
+Analyzer::Analyzer(void *handle) : _handle(handle) {};
 
-Analyzer::~Analyzer() {
-  // We probably SHOULD be closing this, but if we do we for some reason get a segfault :(
-  // I think we are not allowed to close the shared library that we are in ourself
-  //if (_handle) dlclose(_handle);
+Analyzer::~Analyzer() { // We probably SHOULD be closing this, but if we do we
+                        // for some reason get a segfault :(
+                        // I think we are not allowed to close the shared
+                        // library that we are in ourself
+                        // if (_handle) dlclose(_handle);
 };
-
 };

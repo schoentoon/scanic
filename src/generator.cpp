@@ -1,4 +1,5 @@
-/* * -----------------------------------------------------------------------------
+/* *
+ * -----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * Toon Schoenmakers <nighteyes1993@gmail.com>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -19,18 +20,12 @@
 namespace Scanic {
 
 Generator::Generator()
-: _messages()
-, _joins()
-, _quits()
-, _parts()
-, _kicks()
-, _nick_changes()
-, _lock()
-, _analyzers() {
-};
+    : _messages(), _joins(), _quits(), _parts(), _kicks(), _nick_changes(),
+      _lock(), _analyzers() {};
 
 std::chrono::duration<double> Generator::sort() {
-  std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
+  std::chrono::time_point<std::chrono::system_clock> start(
+      std::chrono::system_clock::now());
   _messages.sort(Event::compare);
   _joins.sort(Event::compare);
   _quits.sort(Event::compare);
@@ -44,12 +39,12 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
 
   struct AnalyzeData {
     AnalyzeData(Analyzer *analyzer, Generator &generator)
-    : _name(analyzer->name())
-    , _data()
-    , _duration(0.0) {
-      std::chrono::time_point<std::chrono::system_clock> start(std::chrono::system_clock::now());
+        : _name(analyzer->name()), _data(), _duration(0.0) {
+      std::chrono::time_point<std::chrono::system_clock> start(
+          std::chrono::system_clock::now());
       _data = analyzer->analyze(generator);
-      std::chrono::duration<double> elapsed_seconds(std::chrono::system_clock::now() - start);
+      std::chrono::duration<double> elapsed_seconds(
+          std::chrono::system_clock::now() - start);
       _duration = elapsed_seconds.count();
     };
     std::string _name;
@@ -57,7 +52,7 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
     double _duration;
   };
 
-  std::queue<std::future<AnalyzeData>> futures;
+  std::queue<std::future<AnalyzeData> > futures;
   SmartTpl::Data output;
   for (auto &analyzer : _analyzers) {
     auto func = [&analyzer, this]() {
@@ -68,7 +63,8 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
       std::packaged_task<AnalyzeData()> task(func);
       futures.push(std::move(task.get_future()));
       task();
-    } else futures.emplace(std::async(std::launch::async, func));
+    } else
+      futures.emplace(std::async(std::launch::async, func));
   };
   std::map<std::string, SmartTpl::VariantValue> timings;
   while (!futures.empty()) {
@@ -82,7 +78,7 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
   return output;
 };
 
-void Generator::insertInput(Input* input) {
+void Generator::insertInput(Input *input) {
   std::lock_guard<std::mutex> locked(_lock);
   _messages.splice(_messages.begin(), std::move(input->_messages));
   _joins.splice(_joins.begin(), std::move(input->_joins));
@@ -92,12 +88,11 @@ void Generator::insertInput(Input* input) {
   _nick_changes.splice(_nick_changes.begin(), std::move(input->_nick_changes));
 };
 
-void Generator::loadAnalyzer(Analyzer* analyzer) {
+void Generator::loadAnalyzer(Analyzer *analyzer) {
   _analyzers.emplace_back(analyzer, [](Analyzer *analyzer) {
     void *handle = analyzer->_handle;
     delete analyzer;
     dlclose(handle);
   });
 };
-
 };

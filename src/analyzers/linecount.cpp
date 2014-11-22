@@ -1,4 +1,5 @@
-/* * -----------------------------------------------------------------------------
+/* *
+ * -----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * Toon Schoenmakers <nighteyes1993@gmail.com>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -20,22 +21,26 @@ public:
   /**
    *  Return the name of your analyzer
    */
-  const std::string name() const { return "linecount"; };
+  const std::string name() const {
+    return "linecount";
+  };
 
   /**
    *  Override this method to actually analyze the data
    */
   std::shared_ptr<SmartTpl::Value> analyze(const Generator &generator) {
     std::map<std::string, int64_t> lines;
-    for (auto &msg : generator.messages()) ++lines[msg.author()];
+    for (auto &msg : generator.messages())
+      ++lines[msg.author()];
 
     std::map<std::string, SmartTpl::VariantValue> output;
-    for (auto &l : lines) output.insert(std::make_pair(l.first, l.second));
+    for (auto &l : lines)
+      output.insert(std::make_pair(l.first, l.second));
 
-    return std::shared_ptr<SmartTpl::Value>(new SmartTpl::VariantValue(std::move(output)));
+    return std::shared_ptr<SmartTpl::Value>(
+        new SmartTpl::VariantValue(std::move(output)));
   };
 };
-
 };
 
 ANALYZEMODULE(Scanic::LineCountAnalyzer);

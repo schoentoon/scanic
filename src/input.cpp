@@ -1,4 +1,5 @@
-/* * -----------------------------------------------------------------------------
+/* *
+ * -----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
  * Toon Schoenmakers <nighteyes1993@gmail.com>
  * wrote this file. As long as you retain this notice you can do whatever you
@@ -14,18 +15,10 @@
 namespace Scanic {
 
 Input::Input(const std::shared_ptr<Generator> &generator)
-: _generator(generator)
-, _messages()
-, _joins()
-, _quits()
-, _parts()
-, _kicks()
-, _nick_changes()
-, _analyzers() {
-};
+    : _generator(generator), _messages(), _joins(), _quits(), _parts(),
+      _kicks(), _nick_changes(), _analyzers() {};
 
 Input::~Input() {
   _generator->insertInput(this);
 };
-
 };
