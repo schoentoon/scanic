@@ -95,14 +95,8 @@ public:
 
 class LineCountAnalyzer : public Analyzer {
 public:
-  LineCountAnalyzer(void *handle) : Analyzer(handle) {};
+  LineCountAnalyzer(void *handle, const char *name) : Analyzer(handle, name) {};
   virtual ~LineCountAnalyzer() {};
-  /**
-   *  Return the name of your analyzer
-   */
-  const std::string name() const {
-    return "linecount";
-  };
 
   /**
    *  Override this method to actually analyze the data
@@ -117,4 +111,4 @@ public:
 };
 };
 
-ANALYZEMODULE(Scanic::LineCountAnalyzer);
+ANALYZEMODULE(Scanic::LineCountAnalyzer, "linecount");

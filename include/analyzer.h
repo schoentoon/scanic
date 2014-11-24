@@ -13,7 +13,7 @@
 #include <memory>
 #include <smarttpl.h>
 
-#define ANALYZEMODULE(classname) extern "C" Scanic::Analyzer* loadAnalyzer(void *handle) { return new classname(handle); }
+#define ANALYZEMODULE(classname, human_name) extern "C" Scanic::Analyzer* loadAnalyzer(void *handle) { return new classname(handle, human_name); }
 
 namespace Scanic {
 
@@ -27,19 +27,24 @@ private:
   void* _handle;
 
   /**
+   * The name of the actual analyzer
+   */
+  std::string _name;
+
+  /**
    * Generator is our friend so he can unload us before deleting us
    */
   friend class Generator;
 
 public:
-  Analyzer(void *handle);
+  Analyzer(void *handle, const char *name);
   Analyzer(const Analyzer& that) = delete;
   Analyzer* operator=(const Analyzer& that) = delete;
   virtual ~Analyzer();
   /**
    *  Return the name of your analyzer
    */
-  virtual const std::string name() const = 0;
+  const std::string &name() const { return _name; };
 
   /**
    *  Override this method to actually analyze the data
