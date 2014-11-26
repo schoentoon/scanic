@@ -14,7 +14,8 @@
 
 namespace Scanic {
 
-Analyzer::Analyzer(void *handle, const char *name) : _handle(handle), _name(name) {};
+Analyzer::Analyzer(void *handle, const char *name)
+    : _handle(handle), _name(name) {};
 
 Analyzer::~Analyzer() { // We probably SHOULD be closing this, but if we do we
                         // for some reason get a segfault :(
