@@ -47,7 +47,7 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
           std::chrono::system_clock::now() - start);
       _duration = elapsed_seconds.count();
     };
-    std::string _name;
+    const std::string &_name;
     std::shared_ptr<SmartTpl::Value> _data;
     double _duration;
   };
