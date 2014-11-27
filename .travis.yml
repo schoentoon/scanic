@@ -1,6 +1,5 @@
 language: cpp
 compiler:
   - clang
-  - gcc
 script:
   - make CXX=$CXX CC=$CC CXXFLAGS=-Werror
