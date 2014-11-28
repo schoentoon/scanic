@@ -58,7 +58,7 @@ public:
 
   virtual ~Message() {};
 
-  const std::string message() const { return _message; };
+  const std::string& message() const { return _message; };
   Message& message(const std::string &message) {
     _message = message;
     return *this;
@@ -68,7 +68,7 @@ public:
     return *this;
   };
 
-  const std::string author() const { return _author; };
+  const std::string& author() const { return _author; };
   Message& author(const std::string &author) {
     _author = author;
     return *this;

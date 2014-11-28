@@ -38,7 +38,7 @@ public:
 
   virtual ~NickChangeEvent() {};
 
-  const std::string originalUsername() const { return _original_username; };
+  const std::string& originalUsername() const { return _original_username; };
   NickChangeEvent& originalUsername(const std::string &original_username) {
     _original_username = original_username;
     return *this;
@@ -48,7 +48,7 @@ public:
     return *this;
   };
 
-  const std::string newUsername() const { return _new_username; };
+  const std::string& newUsername() const { return _new_username; };
   NickChangeEvent& newUsername(const std::string &new_username) {
     _new_username = new_username;
     return *this;

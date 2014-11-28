@@ -38,7 +38,7 @@ public:
 
   virtual ~QuitEvent() {};
 
-  const std::string username() const { return _username; };
+  const std::string& username() const { return _username; };
   QuitEvent& username(const std::string &username) {
     _username = username;
     return *this;
@@ -48,7 +48,7 @@ public:
     return *this;
   };
 
-  const std::string message() const { return _message; };
+  const std::string& message() const { return _message; };
   QuitEvent& message(const std::string &message) {
     _message = message;
     return *this;

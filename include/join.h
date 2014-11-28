@@ -31,7 +31,7 @@ public:
 
   virtual ~JoinEvent() {};
 
-  const std::string username() const { return _username; };
+  const std::string& username() const { return _username; };
   JoinEvent& username(const std::string &username) {
     _username = username;
     return *this;
