@@ -39,16 +39,16 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
 
   struct AnalyzeData {
     AnalyzeData(Analyzer *analyzer, Generator &generator)
-        : _name(analyzer->name()), _data(), _duration(0.0) {
-      std::chrono::time_point<std::chrono::system_clock> start(
-          std::chrono::system_clock::now());
-      _data = analyzer->analyze(generator);
-      std::chrono::duration<double> elapsed_seconds(
-          std::chrono::system_clock::now() - start);
-      _duration = elapsed_seconds.count();
-    };
+        : _start(std::chrono::system_clock::now()), _name(analyzer->name()),
+          _data(analyzer->analyze(generator)),
+          _duration(std::chrono::duration<double>(
+                        std::chrono::system_clock::now() - _start).count()) {};
+    // This property is purely so we can measure the entire lifetime of the
+    // constructor
+    std::chrono::time_point<std::chrono::system_clock> _start;
+
     const std::string &_name;
-    std::shared_ptr<SmartTpl::Value> _data;
+    SmartTpl::VariantValue _data;
     double _duration;
   };
 
@@ -70,7 +70,7 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
   while (!futures.empty()) {
     auto &future = futures.front();
     auto ret = future.get();
-    output.assignManaged(ret._name, ret._data);
+    output.assign(ret._name, ret._data);
     timings.insert(std::make_pair(ret._name, ret._duration));
     futures.pop();
   };

@@ -101,7 +101,7 @@ public:
   /**
    *  Override this method to actually analyze the data
    */
-  std::shared_ptr<SmartTpl::Value> analyze(const Generator &generator) {
+  SmartTpl::VariantValue analyze(const Generator &generator) {
     std::map<std::string, int64_t> lines;
     for (auto &msg : generator.messages())
       ++lines[msg.author()];

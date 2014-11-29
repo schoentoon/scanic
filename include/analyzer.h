@@ -49,7 +49,7 @@ public:
   /**
    *  Override this method to actually analyze the data
    */
-  virtual std::shared_ptr<SmartTpl::Value> analyze(const Generator &generator) = 0;
+  virtual SmartTpl::VariantValue analyze(const Generator &generator) = 0;
 
   /**
    * Return true from this method if your analyzer requires sorted data, if not
