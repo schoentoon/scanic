@@ -106,7 +106,7 @@ public:
     for (auto &msg : generator.messages())
       ++lines[msg.author()];
 
-    return std::shared_ptr<SmartTpl::Value>(new SortedByLinesValue(lines));
+    return SmartTpl::VariantValue(std::make_shared<SortedByLinesValue>(lines));
   };
 };
 };
