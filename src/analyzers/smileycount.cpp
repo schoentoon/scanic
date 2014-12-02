@@ -105,7 +105,8 @@ public:
    *  Override this method to actually analyze the data
    */
   SmartTpl::VariantValue analyze(const Generator &generator) {
-    static std::vector<std::string> smilies = { ":D", ":)", ":(" };
+    static std::vector<std::string> smilies = { ":D",   ":)",  ":(", ";)",
+                                                "\\o/", "\\o", "o/", "^_^" };
     std::map<std::string, int64_t> output;
 
     for (auto &msg : generator.messages()) {

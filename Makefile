@@ -6,7 +6,7 @@ CXX               := c++
 
 BINARY := scanic
 INPUT_MODULES := inputs/input_znc.so
-ANALYZERS := analyzers/linecount.so
+ANALYZERS := analyzers/linecount.so analyzers/smileycount.so
 DEPS := build/input.o build/analyzer.o build/generator.o
 
 all: $(BINARY) $(INPUT_MODULES) $(ANALYZERS)
