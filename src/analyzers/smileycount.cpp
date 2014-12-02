@@ -115,7 +115,6 @@ public:
 
         while (pos != std::string::npos) {
           ++output[smiley];
-          std::cerr << msgstr << " " << output[smiley] << std::endl;
           pos = msgstr.find(smiley, pos + 1);
         }
       }
