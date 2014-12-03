@@ -82,12 +82,12 @@ int main(int argc, char **argv) {
       };
       input_handle = dlopen(optarg, RTLD_NOW);
       if (input_handle == nullptr) {
-        std::cerr << dlerror() << std::endl;
+        std::cerr << optarg << ": " << dlerror() << std::endl;
         return 1;
       };
       input_creator = (InputCreator *)dlsym(input_handle, "loadInput");
       if (input_creator == nullptr) {
-        std::cerr << dlerror() << std::endl;
+        std::cerr << optarg << ": " << dlerror() << std::endl;
         return 1;
       };
       break;
@@ -97,21 +97,21 @@ int main(int argc, char **argv) {
     case 'a': {
       struct stat st_buf;
       if (stat(optarg, &st_buf) != 0) {
-        std::cerr << strerror(errno) << std::endl;
+        std::cerr << optarg << ": " << strerror(errno) << std::endl;
         return 1;
       };
 
       if (S_ISREG(st_buf.st_mode)) {
         void *handle = dlopen(optarg, RTLD_NOW);
         if (handle == nullptr) {
-          std::cerr << dlerror() << std::endl;
+          std::cerr << optarg << ": " << dlerror() << std::endl;
           return 1;
         };
         typedef Analyzer *(AnalyzerCreator)(void * handle);
         AnalyzerCreator *func =
             (AnalyzerCreator *)dlsym(handle, "loadAnalyzer");
         if (func == nullptr) {
-          std::cerr << dlerror() << std::endl;
+          std::cerr << optarg << ": " << dlerror() << std::endl;
           return 1;
         };
         generator->loadAnalyzer(func(handle));
@@ -129,14 +129,14 @@ int main(int argc, char **argv) {
             file.append(ent->d_name);
             void *handle = dlopen(file.c_str(), RTLD_NOW);
             if (handle == nullptr) {
-              std::cerr << dlerror() << std::endl;
+              std::cerr << file << ": " << dlerror() << std::endl;
               return 1;
             };
             typedef Analyzer *(AnalyzerCreator)(void * handle);
             AnalyzerCreator *func =
                 (AnalyzerCreator *)dlsym(handle, "loadAnalyzer");
             if (func == nullptr) {
-              std::cerr << dlerror() << std::endl;
+              std::cerr << file << ": " << dlerror() << std::endl;
               return 1;
             };
             generator->loadAnalyzer(func(handle));
