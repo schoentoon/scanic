@@ -1,6 +1,6 @@
 override CXXFLAGS += -std=c++11 -g -Wall -O2 -pipe -fPIE -Weffc++
 INC               += -Iinclude -Iinclude/analyzers
-LDFLAGS           := -lsmarttpl -pthread -ldl -Wl,--export-dynamic
+LDFLAGS           := -lsmarttpl -lconfig++ -pthread -ldl -Wl,--export-dynamic
 CC                := cc
 CXX               := c++
 

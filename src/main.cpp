@@ -17,6 +17,7 @@
 #include <list>
 
 #include <smarttpl.h>
+#include <libconfig.h++>
 
 #include <sys/stat.h>
 #include <string.h>
@@ -35,6 +36,7 @@ static const struct option g_LongOpts[] = {
   { "template", required_argument, 0, 't' },
   { "output", required_argument, 0, 'o' },
   { "no-threads", no_argument, 0, 'T' },
+  { "config", required_argument, 0, 'c' },
   { 0, 0, 0, 0 }
 };
 
@@ -66,10 +68,12 @@ int main(int argc, char **argv) {
   InputCreator *input_creator = nullptr;
   bool no_threads = false;
 
+  libconfig::Config config;
+
   std::shared_ptr<Generator> generator(new Generator());
 
   int arg, optindex;
-  while ((arg = getopt_long(argc, argv, "hI:i:a:t:o:T", g_LongOpts,
+  while ((arg = getopt_long(argc, argv, "hI:i:a:t:o:Tc:", g_LongOpts,
                             &optindex)) != -1) {
     switch (arg) {
     case 'h':
@@ -153,6 +157,9 @@ int main(int argc, char **argv) {
       break;
     case 'T':
       no_threads = true;
+      break;
+    case 'c':
+      config.readFile(optarg);
       break;
     };
   };
