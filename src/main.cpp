@@ -41,18 +41,20 @@ static const struct option g_LongOpts[] = {
 };
 
 static int usage(const char *prog) {
-  std::cerr << "USAGE: " << prog << " [options]" << std::endl
-            << "-h, --help         Show this help message" << std::endl
-            << "-I, --input-module The input module to use" << std::endl
-            << "-i, --input        Input file/folder, repeat for multiple "
-               "files/folders" << std::endl
-            << "-t, --template     Use this template to generate our output"
-            << std::endl
-            << "-o, --output       Output file for the generated output"
-            << std::endl
-            << "-a, --analyzer     Load this analyzer and use it for our output"
-            << std::endl << "-T, --no-threads   Launch with less/no threads."
-            << std::endl;
+  std::cerr
+      << "USAGE: " << prog << " [options]" << std::endl
+      << "-h, --help         Show this help message" << std::endl
+      << "-I, --input-module The input module to use" << std::endl
+      << "-i, --input        Input file/folder, repeat for multiple "
+         "files/folders" << std::endl
+      << "-t, --template     Use this template to generate our output"
+      << std::endl << "-o, --output       Output file for the generated output"
+      << std::endl
+      << "-a, --analyzer     Load this analyzer and use it for our output"
+      << std::endl << "-T, --no-threads   Launch with less/no threads."
+      << std::endl
+      << "-c, --config       Use this config file for all the configuration"
+      << std::endl;
   return 1;
 };
 
