@@ -161,7 +161,13 @@ int main(int argc, char **argv) {
       no_threads = true;
       break;
     case 'c':
-      config.readFile(optarg);
+      try {
+        config.readFile(optarg);
+      }
+      catch (const libconfig::ConfigException &error) {
+        std::cerr << error.what() << std::endl;
+        return 1;
+      };
       break;
     };
   };
