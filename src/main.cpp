@@ -163,6 +163,20 @@ int main(int argc, char **argv) {
     case 'c':
       try {
         config.readFile(optarg);
+        std::string val;
+        if (input_handle == nullptr &&
+            config.lookupValue("input_module", val)) {
+          input_handle = dlopen(val.c_str(), RTLD_NOW);
+          if (input_handle == nullptr) {
+            std::cerr << val << ": " << dlerror() << std::endl;
+            return 1;
+          };
+          input_creator = (InputCreator *)dlsym(input_handle, "loadInput");
+          if (input_creator == nullptr) {
+            std::cerr << val << ": " << dlerror() << std::endl;
+            return 1;
+          };
+        }
       }
       catch (const libconfig::ConfigException &error) {
         std::cerr << "There was an error while reading \"" << optarg
