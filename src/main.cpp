@@ -165,7 +165,8 @@ int main(int argc, char **argv) {
         config.readFile(optarg);
       }
       catch (const libconfig::ConfigException &error) {
-        std::cerr << error.what() << std::endl;
+        std::cerr << "There was an error while reading \"" << optarg
+                  << "\": " << error.what() << std::endl;
         return 1;
       };
       break;
