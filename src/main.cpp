@@ -163,6 +163,8 @@ int main(int argc, char **argv) {
     case 'c':
       try {
         config.readFile(optarg);
+
+        // input module loading from config file
         std::string val;
         if (input_handle == nullptr &&
             config.lookupValue("input_module", val)) {
@@ -176,6 +178,17 @@ int main(int argc, char **argv) {
             std::cerr << val << ": " << dlerror() << std::endl;
             return 1;
           };
+        }
+
+        // actual input files, first of a single string as input
+        if (config.exists("input")) {
+          if (config.lookupValue("input", val))
+            input.push_back(val);
+          else if (config.lookup("input").isList()) {
+            auto &list = config.lookup("input");
+            for (int i = 0; i < list.getLength(); ++i)
+              input.push_back(list[i]);
+          }
         }
       }
       catch (const libconfig::ConfigException &error) {
