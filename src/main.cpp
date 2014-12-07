@@ -214,6 +214,11 @@ int main(int argc, char **argv) {
         // simple boolean an single string settings can just be set like this..
         config.lookupValue("output", outputfile);
         config.lookupValue("no_threads", no_threads);
+
+        // the template file we can just specify like this..
+        if (config.exists("template"))
+          tplsource.reset(
+              new SmartTpl::File(config.lookup("template").c_str()));
       }
       catch (const libconfig::ConfigException &error) {
         std::cerr << "There was an error while reading \"" << optarg
