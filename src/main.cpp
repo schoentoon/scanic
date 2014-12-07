@@ -112,14 +112,34 @@ int loadAnalyzer(const std::shared_ptr<Generator> &generator,
   return 0;
 }
 
+void *input_handle = nullptr;
+typedef Input *(InputCreator)(const std::shared_ptr<Generator> &generator);
+InputCreator *input_creator = nullptr;
+
+int loadInputModule(const char *name) {
+  if (input_handle != nullptr) {
+    std::cerr << "You already picked a input module, can only pick one!"
+              << std::endl;
+    return 1;
+  };
+  input_handle = dlopen(name, RTLD_NOW);
+  if (input_handle == nullptr) {
+    std::cerr << name << ": " << dlerror() << std::endl;
+    return 1;
+  };
+  input_creator = (InputCreator *)dlsym(input_handle, "loadInput");
+  if (input_creator == nullptr) {
+    std::cerr << name << ": " << dlerror() << std::endl;
+    return 1;
+  };
+  return 0;
+}
+
 int main(int argc, char **argv) {
   std::list<std::string> input;
   std::unique_ptr<SmartTpl::Source> tplsource;
   std::string outputfile;
 
-  void *input_handle = nullptr;
-  typedef Input *(InputCreator)(const std::shared_ptr<Generator> & generator);
-  InputCreator *input_creator = nullptr;
   bool no_threads = false;
 
   libconfig::Config config;
@@ -132,23 +152,12 @@ int main(int argc, char **argv) {
     switch (arg) {
     case 'h':
       return usage(argv[0]);
-    case 'I':
-      if (input_handle != nullptr) {
-        std::cerr << "You already picked a input module, can only pick one!"
-                  << std::endl;
-        break;
-      };
-      input_handle = dlopen(optarg, RTLD_NOW);
-      if (input_handle == nullptr) {
-        std::cerr << optarg << ": " << dlerror() << std::endl;
-        return 1;
-      };
-      input_creator = (InputCreator *)dlsym(input_handle, "loadInput");
-      if (input_creator == nullptr) {
-        std::cerr << optarg << ": " << dlerror() << std::endl;
-        return 1;
-      };
+    case 'I': {
+      int ret = loadInputModule(optarg);
+      if (ret != 0)
+        return ret;
       break;
+    };
     case 'i':
       input.emplace_back(optarg);
       break;
@@ -172,29 +181,21 @@ int main(int argc, char **argv) {
         config.readFile(optarg);
 
         // input module loading from config file
-        std::string val;
-        if (input_handle == nullptr &&
-            config.lookupValue("input_module", val)) {
-          input_handle = dlopen(val.c_str(), RTLD_NOW);
-          if (input_handle == nullptr) {
-            std::cerr << val << ": " << dlerror() << std::endl;
-            return 1;
-          };
-          input_creator = (InputCreator *)dlsym(input_handle, "loadInput");
-          if (input_creator == nullptr) {
-            std::cerr << val << ": " << dlerror() << std::endl;
-            return 1;
-          };
+        if (input_handle == nullptr && input_creator == nullptr &&
+            config.exists("input_module")) {
+          int ret = loadInputModule(config.lookup("input_module"));
+          if (ret != 0)
+            return ret;
         }
 
         // actual input files, first of a single string as input
         if (config.exists("input")) {
-          if (config.lookupValue("input", val))
-            input.push_back(val);
-          else if (config.lookup("input").isList()) {
-            auto &list = config.lookup("input");
-            for (int i = 0; i < list.getLength(); ++i)
-              input.push_back(list[i]);
+          auto &input_setting = config.lookup("input");
+          if (input_setting.isScalar())
+            input.push_back(input_setting);
+          else if (input_setting.isList()) {
+            for (int i = 0; i < input_setting.getLength(); ++i)
+              input.push_back(input_setting[i]);
           }
         }
 
@@ -202,8 +203,11 @@ int main(int argc, char **argv) {
         if (config.exists("analyzers")) {
           auto &analyzers = config.lookup("analyzers");
           if (analyzers.isList()) {
-            for (int i = 0; i < analyzers.getLength(); ++i)
-              loadAnalyzer(generator, analyzers[i]);
+            for (int i = 0; i < analyzers.getLength(); ++i) {
+              int ret = loadAnalyzer(generator, analyzers[i]);
+              if (ret != 0)
+                return ret;
+            }
           }
         }
       }
@@ -251,7 +255,7 @@ int main(int argc, char **argv) {
     };
 
     if (S_ISREG(st_buf.st_mode)) {
-      auto func = [input_creator, generator, in]()->uint64_t {
+      auto func = [generator, in]()->uint64_t {
         uint64_t processed_lines = 0;
         std::unique_ptr<Input> input(input_creator(generator));
         // Open the file, loop through it and pass every line to our input
@@ -289,7 +293,7 @@ int main(int argc, char **argv) {
 
           if (stat(in.c_str(), &st_buf) == 0) {
             if (S_ISREG(st_buf.st_mode)) {
-              auto func = [input_creator, generator, logfilename]()->uint64_t {
+              auto func = [generator, logfilename]()->uint64_t {
                 uint64_t processed_lines = 0;
                 std::unique_ptr<Input> input(input_creator(generator));
                 // Open the file, loop through it and pass every line to our
