@@ -369,7 +369,7 @@ int main(int argc, char **argv) {
     std::ofstream outstream(outputfile);
 
     if (!outstream.is_open()) {
-      std::cerr << strerror(errno) << std::endl;
+      std::cerr << outputfile << ": " << strerror(errno) << std::endl;
       return 1;
     };
 
