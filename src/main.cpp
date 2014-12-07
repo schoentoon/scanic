@@ -210,6 +210,10 @@ int main(int argc, char **argv) {
             }
           }
         }
+
+        // simple boolean an single string settings can just be set like this..
+        config.lookupValue("output", outputfile);
+        config.lookupValue("no_threads", no_threads);
       }
       catch (const libconfig::ConfigException &error) {
         std::cerr << "There was an error while reading \"" << optarg
