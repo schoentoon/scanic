@@ -53,7 +53,6 @@ public:
   SortedByCountValue(const std::map<std::string, int64_t> &input) : _value() {
     for (auto &smiley : input) {
       _value.push_back(smiley);
-      std::cerr << smiley.first << " " << smiley.second << std::endl;
     }
 
     std::sort(
