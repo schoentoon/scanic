@@ -95,21 +95,23 @@ public:
 };
 
 class SmileyCountAnalyzer : public Analyzer {
+private:
+  std::vector<std::string> _smilies;
+
 public:
   SmileyCountAnalyzer(void *handle, const char *name)
-      : Analyzer(handle, name) {};
+      : Analyzer(handle, name),
+        _smilies({ ":D", ":)", ":(", ";)", "\\o/", "\\o", "o/", "^_^" }) {};
   virtual ~SmileyCountAnalyzer() {};
 
   /**
    *  Override this method to actually analyze the data
    */
   SmartTpl::VariantValue analyze(const Generator &generator) {
-    static std::vector<std::string> smilies = { ":D",   ":)",  ":(", ";)",
-                                                "\\o/", "\\o", "o/", "^_^" };
     std::map<std::string, int64_t> output;
 
     for (auto &msg : generator.messages()) {
-      for (auto &smiley : smilies) {
+      for (auto &smiley : _smilies) {
         const std::string &msgstr = msg.message();
         std::string::size_type pos = msgstr.find(smiley);
 
