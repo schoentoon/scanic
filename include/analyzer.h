@@ -12,6 +12,7 @@
 #include <map>
 #include <memory>
 #include <smarttpl.h>
+#include <libconfig.h++>
 
 #define ANALYZEMODULE(classname, human_name) extern "C" Scanic::Analyzer* loadAnalyzer(void *handle) { return new classname(handle, human_name); }
 
@@ -45,6 +46,12 @@ public:
    *  Return the name of your analyzer
    */
   const std::string &name() const { return _name; };
+
+  /**
+   *  Overload this method to load analyzers specify settings
+   *  @return  false in case you don't agree with the config that is coming in
+   */
+  virtual bool onConfig(const libconfig::Setting &setting) { return true; };
 
   /**
    *  Override this method to actually analyze the data

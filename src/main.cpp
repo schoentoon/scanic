@@ -60,6 +60,8 @@ static int usage(const char *prog) {
 
 using namespace Scanic;
 
+libconfig::Config config;
+
 int loadAnalyzer(const std::shared_ptr<Generator> &generator,
                  const char *name) {
   struct stat st_buf;
@@ -80,35 +82,17 @@ int loadAnalyzer(const std::shared_ptr<Generator> &generator,
       std::cerr << name << ": " << dlerror() << std::endl;
       return 1;
     };
-    generator->loadAnalyzer(func(handle));
-  } else if (S_ISDIR(st_buf.st_mode)) {
-    struct dirent *ent;
-    DIR *dir = nullptr;
-    if ((dir = opendir(name)) != nullptr) {
-      while ((ent = readdir(dir)) != nullptr) {
-        // Skip hidden files and . and ..
-        if (ent->d_name[0] == '.')
-          continue;
-
-        std::string file(name);
-        file.push_back('/');
-        file.append(ent->d_name);
-        void *handle = dlopen(file.c_str(), RTLD_NOW);
-        if (handle == nullptr) {
-          std::cerr << file << ": " << dlerror() << std::endl;
-          return 1;
-        };
-        typedef Analyzer *(AnalyzerCreator)(void * handle);
-        AnalyzerCreator *func =
-            (AnalyzerCreator *)dlsym(handle, "loadAnalyzer");
-        if (func == nullptr) {
-          std::cerr << file << ": " << dlerror() << std::endl;
-          return 1;
-        };
-        generator->loadAnalyzer(func(handle));
-      };
-    };
-  };
+    Analyzer *analyzer = func(handle);
+    if (config.exists(name)) {
+      if (!analyzer->onConfig(config.lookup(name))) {
+        delete analyzer;
+        dlclose(handle);
+        return 1;
+      }
+    }
+    generator->loadAnalyzer(analyzer);
+  } else
+    return 1;
   return 0;
 }
 
@@ -141,8 +125,6 @@ int main(int argc, char **argv) {
   std::string outputfile;
 
   bool no_threads = false;
-
-  libconfig::Config config;
 
   std::shared_ptr<Generator> generator(new Generator());
 
@@ -211,7 +193,8 @@ int main(int argc, char **argv) {
           }
         }
 
-        // simple boolean an single string settings can just be set like this..
+        // simple boolean an single string settings can just be set like
+        // this..
         config.lookupValue("output", outputfile);
         config.lookupValue("no_threads", no_threads);
 
@@ -343,7 +326,8 @@ int main(int argc, char **argv) {
     futures.pop();
   };
 
-  // We no longer need the input module at this point so let's close it and all
+  // We no longer need the input module at this point so let's close it and
+  // all
   dlclose(input_handle);
   input_handle = nullptr;
   input_creator = nullptr;

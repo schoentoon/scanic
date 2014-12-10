@@ -105,6 +105,15 @@ public:
   virtual ~SmileyCountAnalyzer() {};
 
   /**
+  *  Overload this method to load analyzers specify settings
+  *  @return  false in case you don't agree with the config that is coming in
+  */
+  bool onConfig(const libconfig::Setting &setting) override {
+    std::cerr << "onConfig()" << std::endl;
+    return true;
+  };
+
+  /**
    *  Override this method to actually analyze the data
    */
   SmartTpl::VariantValue analyze(const Generator &generator) {
