@@ -83,8 +83,8 @@ int loadAnalyzer(const std::shared_ptr<Generator> &generator,
       return 1;
     };
     Analyzer *analyzer = func(handle);
-    if (config.exists(name)) {
-      if (!analyzer->onConfig(config.lookup(name))) {
+    if (config.exists(analyzer->name())) {
+      if (!analyzer->onConfig(config.lookup(analyzer->name()))) {
         delete analyzer;
         dlclose(handle);
         return 1;
