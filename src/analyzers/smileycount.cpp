@@ -109,8 +109,15 @@ public:
   *  @return  false in case you don't agree with the config that is coming in
   */
   bool onConfig(const libconfig::Setting &setting) override {
-    std::cerr << "onConfig()" << std::endl;
-    return true;
+    if (setting.exists("smilies")) {
+      auto &smilies = setting["smilies"];
+      if (smilies.isList()) {
+        for (int i = 0; i < smilies.getLength(); ++i)
+          _smilies.push_back(smilies[i]);
+      }
+      return true;
+    } else
+      return false;
   };
 
   /**
