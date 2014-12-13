@@ -96,7 +96,7 @@ public:
 
 class SmileyCountAnalyzer : public Analyzer {
 private:
-  std::vector<std::string> _smilies;
+  std::set<std::string> _smilies;
 
 public:
   SmileyCountAnalyzer(void *handle, const char *name)
@@ -113,7 +113,7 @@ public:
       auto &smilies = setting["smilies"];
       if (smilies.isList()) {
         for (int i = 0; i < smilies.getLength(); ++i)
-          _smilies.push_back(smilies[i]);
+          _smilies.insert(smilies[i]);
       }
       return true;
     } else
