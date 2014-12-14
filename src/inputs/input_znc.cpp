@@ -19,9 +19,9 @@ namespace Scanic {
 class ZncInput : public Input {
 public:
   ZncInput(const std::shared_ptr<Generator> &generator)
-      : Input(std::move(generator)) {};
+      : Input(std::move(generator)){};
 
-  virtual ~ZncInput() {};
+  virtual ~ZncInput(){};
 
   void process(const std::string &input, const std::string &path) override {
     std::string date_string = path.substr(path.find_last_of('_'));
@@ -125,9 +125,10 @@ public:
           4; // Increase it by 4 so we're at the first character of the username
       std::size_t end_user = input.find_first_of(' ', open_user);
 
-      output.author(input.substr(open_user, end_user - open_user)).message(
-          input.substr(end_user + 2)); // + 2 to skip the > of the username and
-                                       // the space just after it
+      output.author(input.substr(open_user, end_user - open_user))
+          .message(input.substr(end_user +
+                                2)); // + 2 to skip the > of the username and
+                                     // the space just after it
 
       publishMessage(std::move(output));
 
@@ -145,14 +146,14 @@ public:
                                end_user - open_user -
                                    1)) // +1 to the open to skip the < and - 1
                                        // to the end to skip the >
-                                           .message(input.substr(end_user + 2))
-                                           .time(std::move(time)); // + 2 to
-                                                                   // skip the >
-                                                                   // of the
-                                                                   // username
-                                                                   // and the
-                                                                   // space just
-                                                                   // after it
+        .message(input.substr(end_user + 2))
+        .time(std::move(time)); // + 2 to
+                                // skip the >
+                                // of the
+                                // username
+                                // and the
+                                // space just
+                                // after it
 
     publishMessage(std::move(output));
   };

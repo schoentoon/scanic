@@ -16,38 +16,30 @@ namespace Scanic {
 
 class SortedByLinesIterator : public SmartTpl::Iterator {
 private:
-  std::vector<std::pair<std::string, int64_t> >::const_iterator _iter;
+  std::vector<std::pair<std::string, int64_t>>::const_iterator _iter;
 
-  std::vector<std::pair<std::string, int64_t> >::const_iterator _end;
+  std::vector<std::pair<std::string, int64_t>>::const_iterator _end;
 
 public:
   SortedByLinesIterator(
-      const std::vector<std::pair<std::string, int64_t> >::const_iterator &iter,
-      const std::vector<std::pair<std::string, int64_t> >::const_iterator &end)
+      const std::vector<std::pair<std::string, int64_t>>::const_iterator &iter,
+      const std::vector<std::pair<std::string, int64_t>>::const_iterator &end)
       : _iter(iter), _end(end) {}
 
-  virtual ~SortedByLinesIterator() {};
+  virtual ~SortedByLinesIterator(){};
 
-  bool valid() const override {
-    return _iter != _end;
-  };
+  bool valid() const override { return _iter != _end; };
 
-  void next() override {
-    ++_iter;
-  };
+  void next() override { ++_iter; };
 
-  SmartTpl::VariantValue value() const override {
-    return _iter->second;
-  };
+  SmartTpl::VariantValue value() const override { return _iter->second; };
 
-  SmartTpl::VariantValue key() const override {
-    return _iter->first;
-  };
+  SmartTpl::VariantValue key() const override { return _iter->first; };
 };
 
 class SortedByLinesValue : public SmartTpl::Value {
 private:
-  std::vector<std::pair<std::string, int64_t> > _value;
+  std::vector<std::pair<std::string, int64_t>> _value;
 
 public:
   SortedByLinesValue(const std::map<std::string, int64_t> &input) : _value() {
@@ -60,23 +52,15 @@ public:
            std::pair<std::string, int64_t> b) { return a.second > b.second; });
   };
 
-  virtual ~SortedByLinesValue() {};
+  virtual ~SortedByLinesValue(){};
 
-  std::string toString() const override {
-    return "";
-  };
+  std::string toString() const override { return ""; };
 
-  numeric_t toNumeric() const override {
-    return 0;
-  };
+  numeric_t toNumeric() const override { return 0; };
 
-  bool toBoolean() const override {
-    return false;
-  };
+  bool toBoolean() const override { return false; };
 
-  double toDouble() const override {
-    return 0.0;
-  };
+  double toDouble() const override { return 0.0; };
 
   SmartTpl::VariantValue member(const char *name, size_t size) const override {
     return nullptr;
@@ -95,8 +79,8 @@ public:
 
 class LineCountAnalyzer : public Analyzer {
 public:
-  LineCountAnalyzer(void *handle, const char *name) : Analyzer(handle, name) {};
-  virtual ~LineCountAnalyzer() {};
+  LineCountAnalyzer(void *handle, const char *name) : Analyzer(handle, name){};
+  virtual ~LineCountAnalyzer(){};
 
   /**
    *  Override this method to actually analyze the data

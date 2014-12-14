@@ -16,38 +16,30 @@ namespace Scanic {
 
 class SortedByCountIterator : public SmartTpl::Iterator {
 private:
-  std::vector<std::pair<std::string, int64_t> >::const_iterator _iter;
+  std::vector<std::pair<std::string, int64_t>>::const_iterator _iter;
 
-  std::vector<std::pair<std::string, int64_t> >::const_iterator _end;
+  std::vector<std::pair<std::string, int64_t>>::const_iterator _end;
 
 public:
   SortedByCountIterator(
-      const std::vector<std::pair<std::string, int64_t> >::const_iterator &iter,
-      const std::vector<std::pair<std::string, int64_t> >::const_iterator &end)
+      const std::vector<std::pair<std::string, int64_t>>::const_iterator &iter,
+      const std::vector<std::pair<std::string, int64_t>>::const_iterator &end)
       : _iter(iter), _end(end) {}
 
-  virtual ~SortedByCountIterator() {};
+  virtual ~SortedByCountIterator(){};
 
-  bool valid() const override {
-    return _iter != _end;
-  };
+  bool valid() const override { return _iter != _end; };
 
-  void next() override {
-    ++_iter;
-  };
+  void next() override { ++_iter; };
 
-  SmartTpl::VariantValue value() const override {
-    return _iter->second;
-  };
+  SmartTpl::VariantValue value() const override { return _iter->second; };
 
-  SmartTpl::VariantValue key() const override {
-    return _iter->first;
-  };
+  SmartTpl::VariantValue key() const override { return _iter->first; };
 };
 
 class SortedByCountValue : public SmartTpl::Value {
 private:
-  std::vector<std::pair<std::string, int64_t> > _value;
+  std::vector<std::pair<std::string, int64_t>> _value;
 
 public:
   SortedByCountValue(const std::map<std::string, int64_t> &input) : _value() {
@@ -61,23 +53,15 @@ public:
            std::pair<std::string, int64_t> b) { return a.second > b.second; });
   };
 
-  virtual ~SortedByCountValue() {};
+  virtual ~SortedByCountValue(){};
 
-  std::string toString() const override {
-    return "";
-  };
+  std::string toString() const override { return ""; };
 
-  numeric_t toNumeric() const override {
-    return 0;
-  };
+  numeric_t toNumeric() const override { return 0; };
 
-  bool toBoolean() const override {
-    return false;
-  };
+  bool toBoolean() const override { return false; };
 
-  double toDouble() const override {
-    return 0.0;
-  };
+  double toDouble() const override { return 0.0; };
 
   SmartTpl::VariantValue member(const char *name, size_t size) const override {
     return nullptr;
@@ -101,8 +85,8 @@ private:
 public:
   SmileyCountAnalyzer(void *handle, const char *name)
       : Analyzer(handle, name),
-        _smilies({ ":D", ":)", ":(", ";)", "\\o/", "\\o", "o/", "^_^" }) {};
-  virtual ~SmileyCountAnalyzer() {};
+        _smilies({":D", ":)", ":(", ";)", "\\o/", "\\o", "o/", "^_^"}){};
+  virtual ~SmileyCountAnalyzer(){};
 
   /**
   *  Overload this method to load analyzers specify settings

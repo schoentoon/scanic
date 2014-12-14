@@ -29,16 +29,15 @@
 #include "analyzer.h"
 
 static const struct option g_LongOpts[] = {
-  { "help", no_argument, 0, 'h' },
-  { "input-module", required_argument, 0, 'I' },
-  { "input", required_argument, 0, 'i' },
-  { "analyzer", required_argument, 0, 'a' },
-  { "template", required_argument, 0, 't' },
-  { "output", required_argument, 0, 'o' },
-  { "no-threads", no_argument, 0, 'T' },
-  { "config", required_argument, 0, 'c' },
-  { 0, 0, 0, 0 }
-};
+    {"help", no_argument, 0, 'h'},
+    {"input-module", required_argument, 0, 'I'},
+    {"input", required_argument, 0, 'i'},
+    {"analyzer", required_argument, 0, 'a'},
+    {"template", required_argument, 0, 't'},
+    {"output", required_argument, 0, 'o'},
+    {"no-threads", no_argument, 0, 'T'},
+    {"config", required_argument, 0, 'c'},
+    {0, 0, 0, 0}};
 
 static int usage(const char *prog) {
   std::cerr
@@ -76,7 +75,7 @@ int loadAnalyzer(const std::shared_ptr<Generator> &generator,
       std::cerr << name << ": " << dlerror() << std::endl;
       return 1;
     };
-    typedef Analyzer *(AnalyzerCreator)(void * handle);
+    typedef Analyzer *(AnalyzerCreator)(void *handle);
     AnalyzerCreator *func = (AnalyzerCreator *)dlsym(handle, "loadAnalyzer");
     if (func == nullptr) {
       std::cerr << name << ": " << dlerror() << std::endl;
@@ -202,8 +201,7 @@ int main(int argc, char **argv) {
         if (config.exists("template"))
           tplsource.reset(
               new SmartTpl::File(config.lookup("template").c_str()));
-      }
-      catch (const libconfig::ConfigException &error) {
+      } catch (const libconfig::ConfigException &error) {
         std::cerr << "There was an error while reading \"" << optarg
                   << "\": " << error.what() << std::endl;
         return 1;
@@ -237,7 +235,7 @@ int main(int argc, char **argv) {
   std::chrono::time_point<std::chrono::system_clock> start(
       std::chrono::system_clock::now());
 
-  std::queue<std::future<uint64_t> > futures;
+  std::queue<std::future<uint64_t>> futures;
 
   for (const std::string &in : input) {
     struct stat st_buf;
@@ -247,7 +245,7 @@ int main(int argc, char **argv) {
     };
 
     if (S_ISREG(st_buf.st_mode)) {
-      auto func = [generator, in]()->uint64_t {
+      auto func = [generator, in]() -> uint64_t {
         uint64_t processed_lines = 0;
         std::unique_ptr<Input> input(input_creator(generator));
         // Open the file, loop through it and pass every line to our input
@@ -256,8 +254,7 @@ int main(int argc, char **argv) {
         for (std::string line; std::getline(logfile, line); ++processed_lines) {
           try {
             input->process(line, in);
-          }
-          catch (const std::exception &error) {
+          } catch (const std::exception &error) {
             std::cerr << error.what() << std::endl;
           };
         }
@@ -285,7 +282,7 @@ int main(int argc, char **argv) {
 
           if (stat(in.c_str(), &st_buf) == 0) {
             if (S_ISREG(st_buf.st_mode)) {
-              auto func = [generator, logfilename]()->uint64_t {
+              auto func = [generator, logfilename]() -> uint64_t {
                 uint64_t processed_lines = 0;
                 std::unique_ptr<Input> input(input_creator(generator));
                 // Open the file, loop through it and pass every line to our
@@ -295,8 +292,7 @@ int main(int argc, char **argv) {
                      ++processed_lines) {
                   try {
                     input->process(line, logfilename);
-                  }
-                  catch (const std::exception &error) {
+                  } catch (const std::exception &error) {
                     std::cerr << error.what() << std::endl;
                   };
                 }

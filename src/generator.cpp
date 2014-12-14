@@ -21,7 +21,7 @@ namespace Scanic {
 
 Generator::Generator()
     : _messages(), _joins(), _quits(), _parts(), _kicks(), _nick_changes(),
-      _lock(), _analyzers() {};
+      _lock(), _analyzers(){};
 
 std::chrono::duration<double> Generator::sort() {
   std::chrono::time_point<std::chrono::system_clock> start(
@@ -42,7 +42,7 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
         : _start(std::chrono::system_clock::now()), _name(analyzer->name()),
           _data(analyzer->analyze(generator)),
           _duration(std::chrono::duration<double>(
-                        std::chrono::system_clock::now() - _start).count()) {};
+                        std::chrono::system_clock::now() - _start).count()){};
     // This property is purely so we can measure the entire lifetime of the
     // constructor
     std::chrono::time_point<std::chrono::system_clock> _start;
@@ -52,7 +52,7 @@ SmartTpl::Data Generator::analyze(bool no_threads) {
     double _duration;
   };
 
-  std::queue<std::future<AnalyzeData> > futures;
+  std::queue<std::future<AnalyzeData>> futures;
   SmartTpl::Data output;
   for (auto &analyzer : _analyzers) {
     auto func = [&analyzer, this]() {

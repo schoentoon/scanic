@@ -3,6 +3,7 @@ INC               += -Iinclude -Iinclude/analyzers
 LDFLAGS           := -lsmarttpl -lconfig++ -pthread -ldl -Wl,--export-dynamic
 CC                := cc
 CXX               := c++
+CLANG_FORMAT      := clang-format
 
 BINARY := scanic
 INPUT_MODULES := inputs/input_znc.so
@@ -31,6 +32,11 @@ analyzers/%.so: src/analyzers/%.cpp analyzers
 
 $(BINARY): build $(DEPS) src/main.cpp
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INC) -o $(BINARY) src/main.cpp $(DEPS) $(LDFLAGS)
+
+.PHONY: format
+
+format:
+	find -name \*.cpp -exec $(CLANG_FORMAT) -style LLVM -i {} \;
 
 .PHONY: clean
 
