@@ -15,5 +15,14 @@
         <tr><td>No smilies? How boring :(</td></tr>
       {/foreach}
       <tr><td colspan=2>smileycount.so took {$timing.smileycount}s</td></tr>
+    </table>
+    <table>
+      {foreach $wordcount as $nick => $count}
+        <tr><td>{$nick}</td><td>{$count}</td></tr>
+      {foreachelse}
+        <tr><td>Nothing was aid? BORING.</td></tr>
+      {/foreach}
+      <tr><td colspan=2>wordcount.so took {$timing.wordcount}s</td></tr>
+    </table>
   </body>
 </html>

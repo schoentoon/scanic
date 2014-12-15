@@ -98,10 +98,11 @@ public:
       if (smilies.isList()) {
         for (int i = 0; i < smilies.getLength(); ++i)
           _smilies.insert(smilies[i]);
+          return true;
       }
-      return true;
-    } else
       return false;
+    }
+    return true;
   };
 
   /**
