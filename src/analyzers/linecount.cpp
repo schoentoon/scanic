@@ -18,7 +18,7 @@ class SortedByLinesIterator : public SmartTpl::Iterator {
 private:
   std::vector<std::pair<std::string, int64_t>>::const_iterator _iter;
 
-  std::vector<std::pair<std::string, int64_t>>::const_iterator _end;
+  const std::vector<std::pair<std::string, int64_t>>::const_iterator _end;
 
 public:
   SortedByLinesIterator(
