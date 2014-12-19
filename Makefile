@@ -7,7 +7,8 @@ CLANG_FORMAT      := clang-format
 
 BINARY := scanic
 INPUT_MODULES := inputs/input_znc.so
-ANALYZERS := analyzers/linecount.so analyzers/smileycount.so analyzers/wordcount.so
+ANALYZERS := analyzers/linecount.so analyzers/smileycount.so analyzers/wordcount.so \
+analyzers/caps.so
 DEPS := build/input.o build/analyzer.o build/generator.o
 
 all: $(BINARY) $(INPUT_MODULES) $(ANALYZERS)
