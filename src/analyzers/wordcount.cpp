@@ -42,7 +42,8 @@ private:
   std::vector<std::pair<std::string, int64_t>> _value;
 
 public:
-  SortedByWordCountValue(const std::map<std::string, int64_t> &input) : _value() {
+  SortedByWordCountValue(const std::map<std::string, int64_t> &input)
+      : _value() {
     for (auto &line : input)
       _value.push_back(line);
 
@@ -94,12 +95,14 @@ public:
           ++words[msg.author()];
           inWord = true;
         } else {
-          if (!std::isalnum(c)) inWord = false;
+          if (!std::isalnum(c))
+            inWord = false;
         }
       }
     }
 
-    return SmartTpl::VariantValue(std::make_shared<SortedByWordCountValue>(words));
+    return SmartTpl::VariantValue(
+        std::make_shared<SortedByWordCountValue>(words));
   };
 };
 };

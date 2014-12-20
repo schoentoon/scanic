@@ -80,8 +80,7 @@ public:
 
 class CapsCountAnalyzer : public Analyzer {
 public:
-  CapsCountAnalyzer(void *handle, const char *name)
-      : Analyzer(handle, name){};
+  CapsCountAnalyzer(void *handle, const char *name) : Analyzer(handle, name){};
   virtual ~CapsCountAnalyzer(){};
 
   /**
@@ -91,11 +90,19 @@ public:
     std::map<std::string, int64_t> output;
 
     for (auto &msg : generator.messages()) {
+      bool caps = true;
+      bool letters = false;
       for (char c : msg.message()) {
-        if (!std::isupper(c)) continue;
+        if (!letters)
+          letters = std::isalpha(c);
+        if (std::isalpha(c) && !std::isupper(c)) {
+          caps = false;
+          break;
+        }
       }
 
-      ++output[msg.author()];
+      if (caps && letters)
+        ++output[msg.author()];
     }
 
     return SmartTpl::VariantValue(std::make_shared<SortedByCountValue>(output));
