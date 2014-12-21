@@ -79,6 +79,12 @@ public:
 };
 
 class CapsCountAnalyzer : public Analyzer {
+private:
+  /**
+   *  The minimum amounts of caps we want to see
+   */
+  std::size_t min_characters = 3;
+
 public:
   CapsCountAnalyzer(void *handle, const char *name) : Analyzer(handle, name){};
   virtual ~CapsCountAnalyzer(){};
@@ -90,18 +96,13 @@ public:
     std::map<std::string, int64_t> output;
 
     for (auto &msg : generator.messages()) {
-      bool caps = true;
-      bool letters = false;
+      std::size_t caps = 0;
       for (char c : msg.message()) {
-        if (!letters)
-          letters = std::isalpha(c);
-        if (std::isalpha(c) && !std::isupper(c)) {
-          caps = false;
-          break;
-        }
+        if (std::isalpha(c) && std::isupper(c))
+          ++caps;
       }
 
-      if (caps && letters)
+      if (caps >= min_characters)
         ++output[msg.author()];
     }
 
