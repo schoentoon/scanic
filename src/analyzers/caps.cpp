@@ -83,11 +83,24 @@ private:
   /**
    *  The minimum amounts of caps we want to see
    */
-  std::size_t min_characters = 3;
+  std::size_t _min_characters = 3;
 
 public:
   CapsCountAnalyzer(void *handle, const char *name) : Analyzer(handle, name){};
   virtual ~CapsCountAnalyzer(){};
+
+  /**
+  *  Overload this method to load analyzers specify settings
+  *  @return  false in case you don't agree with the config that is coming in
+  */
+  bool onConfig(const libconfig::Setting &setting) override {
+    if (setting.exists("min_characters")) {
+      auto &chars = setting["min_characters"];
+      if (!chars.isNumber()) return false;
+      _min_characters = (int) chars;
+    }
+    return true;
+  };
 
   /**
    *  Override this method to actually analyze the data
@@ -102,7 +115,7 @@ public:
           ++caps;
       }
 
-      if (caps >= min_characters)
+      if (caps >= _min_characters)
         ++output[msg.author()];
     }
 
